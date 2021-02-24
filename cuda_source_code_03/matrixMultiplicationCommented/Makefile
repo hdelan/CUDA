@@ -7,7 +7,11 @@ LINK=		nvcc
 CFLAGS= -O3 -finline-functions -ffast-math -fomit-frame-pointer -funroll-loops
 #NVCCFLAGS	= -g -G --use_fast_math -arch=sm_30
 #NVCCFLAGS	= -g -G --use_fast_math -arch=sm_30 -DWITH_MY_DEBUG
+<<<<<<< HEAD
 NVCCFLAGS	= -O2 --use_fast_math #-arch=sm_30
+=======
+NVCCFLAGS	= -O2 --use_fast_math -arch=sm_60
+>>>>>>> 6802ad9b99322fe791450e616db7a1b3b5cafe28
 
 INCPATH       = -I. -I.
 
