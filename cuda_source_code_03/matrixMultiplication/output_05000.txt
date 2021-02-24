@@ -1,0 +1,86 @@
+***************************************************
+Found 2 CUDA-enabled devices
+========================= IDENTITY DATA ==================================
+GPU model name: GeForce RTX 2080 SUPER
+GPU The device is NOT an integrated (motherboard) GPU - i.e. it is a discrete device
+GPU pciBusID: 1
+GPU pciDeviceID: 0
+GPU pciDomainID: 0
+the device is NOT a Tesla one using TCC driver
+========================= COMPUTE DATA ==================================
+GPU Compute capability: 7.5
+GPU Clock frequency in hertzs: 1815000
+GPU Device can concurrently copy memory and execute a kernel: 1
+GPU number of multi-processors: 48
+GPU maximum number of threads per multi-processor: 1024
+GPU Maximum size of each dimension of a grid: 2147483647x65535x65535
+GPU Maximum size of each dimension of a block: 1024x1024x64
+GPU Maximum number of threads per block: 1024
+GPU Maximum pitch in bytes allowed by memory copies: 2147483647
+GPU Compute mode is: 0
+========================= MEMORY DATA ==================================
+GPU total global memory: 8361672704 bytes
+GPU peak memory clock frequency in kilohertz: 7751000 bytes
+GPU memory bus width: 256 bits
+GPU L2 cache size: 4194304 bytes
+GPU 32-bit registers available per block: 65536
+GPU Shared memory available per block in bytes: 49152
+GPU Alignment requirement for textures: 512
+GPU Constant memory available on device in bytes: 65536
+GPU Warp size in threads: 32
+GPU maximum 1D texture size: 131072
+GPU maximum 2D texture size: 131072
+GPU maximum 3D texture size: 16384
+GPU maximum 1D layered texture dimensions: 32768
+GPU maximum 2D layered texture dimensions: 32768
+GPU surface alignment: 512
+GPU The device can map host memory into the CUDA address space
+GPU memory does not have ECC support
+GPU The device DOES NOT share an unified address space with the host
+========================= EXECUTION DATA ==================================
+GPU Concurrent kernels are allowed
+GPU There is a run time limit for kernels executed in the device
+GPU the device is NOT capable of concurrently memory copying
+========================= IDENTITY DATA ==================================
+GPU model name: Tesla K40c
+GPU The device is NOT an integrated (motherboard) GPU - i.e. it is a discrete device
+GPU pciBusID: 2
+GPU pciDeviceID: 0
+GPU pciDomainID: 0
+the device is NOT a Tesla one using TCC driver
+========================= COMPUTE DATA ==================================
+GPU Compute capability: 3.5
+GPU Clock frequency in hertzs: 745000
+GPU Device can concurrently copy memory and execute a kernel: 1
+GPU number of multi-processors: 15
+GPU maximum number of threads per multi-processor: 2048
+GPU Maximum size of each dimension of a grid: 2147483647x65535x65535
+GPU Maximum size of each dimension of a block: 1024x1024x64
+GPU Maximum number of threads per block: 1024
+GPU Maximum pitch in bytes allowed by memory copies: 2147483647
+GPU Compute mode is: 0
+========================= MEMORY DATA ==================================
+GPU total global memory: 11996954624 bytes
+GPU peak memory clock frequency in kilohertz: 3004000 bytes
+GPU memory bus width: 384 bits
+GPU L2 cache size: 1572864 bytes
+GPU 32-bit registers available per block: 65536
+GPU Shared memory available per block in bytes: 49152
+GPU Alignment requirement for textures: 512
+GPU Constant memory available on device in bytes: 65536
+GPU Warp size in threads: 32
+GPU maximum 1D texture size: 65536
+GPU maximum 2D texture size: 65536
+GPU maximum 3D texture size: 4096
+GPU maximum 1D layered texture dimensions: 16384
+GPU maximum 2D layered texture dimensions: 16384
+GPU surface alignment: 512
+GPU The device can map host memory into the CUDA address space
+GPU memory has ECC support
+GPU The device shares an unified address space with the host
+========================= EXECUTION DATA ==================================
+GPU Concurrent kernels are allowed
+GPU There is NOT a run time limit for kernels executed in the device
+GPU The device can concurrently copy memory between host and device in both directions and execute a kernel at the same time
+Choosing Tesla K40c
+****************************
