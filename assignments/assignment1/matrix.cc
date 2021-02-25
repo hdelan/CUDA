@@ -16,10 +16,38 @@ class Matrix {
     Matrix(Matrix & m) : Matrix(m.nrows, m.mcols){
       for (int i = 0; i < nrows; ++i) {
         for (int j = 0; j < mcols; ++j) {
-          data[i*mcols + j];
+          data[i*mcols + j] = m.data[i*mcols + j];
         }
       }
     };
+    void print_matrix(){
+      std::cout << "\n" << nrows << " x " << mcols << " matrix: \n\n";
+      std::cout << std::setprecision(3);
+      for (int i = 0; i < nrows; ++i) {
+        for (int j = 0; j < mcols; ++j) {
+          std::cout << std::setw(8) << data[i*mcols + j];
+        }
+        std::cout << "\n";
+      }
+    };
+    void set_data_value(float val, int nidx, int midx) {
+      if (nidx >= nrows || midx >= mcols || midx < 0 || nidx < 0){
+        std::cerr << "Trying to access data beyond bounds\n";
+        return;
+      }
+      data[nidx*mcols + midx] = val;
+    };
+    Matrix transpose_matrix() {
+      Matrix transpose {Matrix(mcols, nrows)};
+      for (int i = 0; i < nrows; ++i) {
+        for (int j = 0; j < mcols; ++j) {
+          transpose.set_data_value(data[i*mcols + j], j, i);
+        }
+      }
+      return transpose;
+    };
+
+
   private:
     int nrows, mcols;
     float * data;
@@ -38,7 +66,16 @@ int main(int argc, char * argv[]) {
 
   // Default values for n, m
 	unsigned int n {10}, m {10};
-  
+ 
+
+  Matrix A(3, 4);
+  A.print_matrix();
+  A.set_data_value(3.0, 1, 3);
+  A.print_matrix();
+  Matrix B {A};
+  B.print_matrix();
+
+  /*
   // A boolean variable will tell us whether or not we want to print time
   int print_time {0};
   struct timeval start_time;
@@ -87,6 +124,7 @@ int main(int argc, char * argv[]) {
   delete[] transpose;
   delete[] col_sums;
   delete[] row_sums;
+  */
 	return 0;
 	
 }
@@ -181,11 +219,4 @@ void sum_abs_cols(float * matrix, float * colsum, const int nrows, const int mco
   delete[] transpose;
 }
 
-float * transpose_matrix(float * matrix, float * transposed_matrix, const int nrows, const int mcols) {
-  for (int i = 0; i < nrows; ++i) {
-    for (int j = 0; j < mcols; ++j) {
-      transposed_matrix[nrows*j + i] = matrix[i*mcols + j];
-    }
-  }
-  return transposed_matrix;
 }
