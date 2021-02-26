@@ -8,6 +8,9 @@
 
 #define MAX_DIM 1000000
 
+float vector_reduction(const float * vector, const int n);
+void parse_command_line(const int argc, char ** argv, unsigned int &, unsigned int &, long unsigned int &, struct timeval &, int &);
+
 class Matrix {
   public:
     Matrix() = delete;
@@ -20,6 +23,7 @@ class Matrix {
         }
       }
     };
+
     void print_matrix(){
       std::cout << "\n" << nrows << " x " << mcols << " matrix: \n\n";
       std::cout << std::setprecision(3);
@@ -30,23 +34,52 @@ class Matrix {
         std::cout << "\n";
       }
     };
-    void set_data_value(float val, int nidx, int midx) {
-      if (nidx >= nrows || midx >= mcols || midx < 0 || nidx < 0){
+
+    void set_data_value(float val, int idx) {
+      if (idx >= nrows * mcols || idx < 0) {
         std::cerr << "Trying to access data beyond bounds\n";
         return;
       }
-      data[nidx*mcols + midx] = val;
-    };
-    Matrix transpose_matrix() {
-      Matrix transpose {Matrix(mcols, nrows)};
-      for (int i = 0; i < nrows; ++i) {
-        for (int j = 0; j < mcols; ++j) {
-          transpose.set_data_value(data[i*mcols + j], j, i);
-        }
-      }
-      return transpose;
+      data[idx] = val;
     };
 
+    Matrix transpose() {
+      Matrix trans(mcols, nrows);
+      for (int i = 0; i < nrows; ++i) {
+        for (int j = 0; j < mcols; ++j) {
+          trans.set_data_value(data[i*mcols + j], j*nrows + i);
+        }
+      }
+      return trans;
+    };
+
+    void abs_value() {
+      for (int i = 0; i < nrows*mcols; ++i) {
+        set_data_value(std::abs(data[i]), i);
+      }
+    };
+
+    Matrix sum_abs_rows() {
+      Matrix rowsum(nrows, 1);
+      abs_value();
+      for (int i = 0; i < nrows; ++i) {
+        rowsum.set_data_value(vector_reduction((data+(i*mcols)), mcols), i);
+      }
+      return rowsum;
+    };
+
+    Matrix sum_abs_cols() {
+      Matrix trans {transpose()};
+      return (trans.sum_abs_rows()).transpose();
+    };
+
+    float sum_abs_matrix() {
+      float sum = 0.0;
+      for (int i = 0; i < nrows*mcols; ++i) {
+        sum += data[i];
+      }
+      return sum;
+    };
 
   private:
     int nrows, mcols;
@@ -54,77 +87,43 @@ class Matrix {
 };
 
 
-float * transpose_matrix(float *, float *, const int nrows, const int mcols);
-void sum_abs_rows(float *, float *, const int, const int);
-void sum_abs_cols(float *, float *, const int, const int);
-void abs_value(float *, const int, const int);
-float vector_reduction(const float *, const int);
-void print_matrix(const float * matrix, const int n, const int m);
-void parse_command_line(const int argc, char ** argv, unsigned int &, unsigned int &, long unsigned int &, struct timeval &, int &);
 
 int main(int argc, char * argv[]) {
 
   // Default values for n, m
 	unsigned int n {10}, m {10};
- 
-
-  Matrix A(3, 4);
-  A.print_matrix();
-  A.set_data_value(3.0, 1, 3);
-  A.print_matrix();
-  Matrix B {A};
-  B.print_matrix();
-
-  /*
+  
   // A boolean variable will tell us whether or not we want to print time
   int print_time {0};
   struct timeval start_time;
-	
+ 
   // Default seed
 	long unsigned int seed {123456};
   
   // Get optional parameters
   parse_command_line(argc, argv, n, m, seed, start_time, print_time);
 
-  std::cout << "\n\n";
-	std::cout << "Allocating " << n << " x " << m << " matrix." << std::endl;
   
-  float * matrix {new float[n*m]};
-
   // Seed RNG
 	srand48(seed);
-
+  
   // Populate matrix with values from [-10.0, 10.0]
-  for (int i = 0; i < n*m; i++)
-    matrix[i] = (float) (drand48()*20.0) - 10.0;
+  Matrix A(n, m);
+  for (unsigned int i = 0; i < n*m; i++)
+    A.set_data_value((float) (drand48()*20.0) - 10.0, i);
+	
 
+  A.print_matrix();
+  A.transpose().print_matrix();
 
-  std::cout << "\n\n";
-  print_matrix(matrix, n, m);
-  float * transpose {new float[n*m]};
-  transpose_matrix(matrix, transpose, n, m);
-  std::cout << "\n\n";
-  print_matrix(transpose, m, n);
-  float * row_sums {new float[m]};
-  sum_abs_rows(matrix, row_sums, m, n);
-  std::cout << "\n\nRow sums:\n\n";
-  print_matrix(row_sums, m, 1);
-  float * col_sums {new float[n]};
-  sum_abs_cols(matrix, col_sums, m, n);
-  std::cout << "\n\nColumn Sums:\n\n";
-  print_matrix(col_sums, 1, n);
-  std::cout << "\n\n";
+  Matrix colsum = A.sum_abs_cols();
+  Matrix rowsum = A.sum_abs_rows();
 
-  std::cout << "Sum of column sums: " << std::setprecision(8) << vector_reduction(col_sums, n) << std::endl;
-  std::cout << "Sum of row sums: " << vector_reduction(row_sums, m) << std::endl;
+  colsum.print_matrix();
+  std::cout << "\n\nSum of colsums: " << colsum.sum_abs_matrix() << "\n\n";
+  rowsum.print_matrix();
+  std::cout << "\n\nSum of rowsums: " << rowsum.sum_abs_matrix() << "\n\n";
 
-
-	std::cout << "Deleting " << n << " x " << m << " matrix." << std::endl;
-  delete[] matrix;
-  delete[] transpose;
-  delete[] col_sums;
-  delete[] row_sums;
-  */
 	return 0;
 	
 }
@@ -181,16 +180,6 @@ void parse_command_line(const int argc, char ** argv, unsigned int & n, unsigned
   }
 }
 
-void print_matrix(const float * matrix, const int n, const int m) {
-  std::cout << std::setprecision(3);
-  for (int i = 0; i < n; ++i) {
-    for (int j = 0; j < m; ++j) {
-      std::cout << std::setw(8) << matrix[i*m + j];
-    }
-    std::cout << "\n";
-  }
-}
-
 float vector_reduction(const float * vector, const int n) {
   float sum = 0.0;
   for (int i = 0; i < n; ++i) {
@@ -199,24 +188,3 @@ float vector_reduction(const float * vector, const int n) {
   return sum;
 }
 
-void abs_value(float* matrix, const int n, const int m) {
-  for (int i = 0; i < n*m; ++i) {
-    matrix[i] = std::abs(matrix[i]);
-  }
-}
-
-void sum_abs_rows(float * matrix, float * rowsum, const int nrows, const int mcols) {
-  abs_value(matrix, nrows, mcols);
-  for (int i = 0; i < nrows; ++i) {
-    rowsum[i] = vector_reduction((matrix+(i*mcols)), mcols);
-  }
-}
-
-void sum_abs_cols(float * matrix, float * colsum, const int nrows, const int mcols) {
-  float * transpose {new float[nrows*mcols]};
-  transpose_matrix(matrix, transpose, nrows, mcols);
-  sum_abs_rows(matrix, colsum, mcols, nrows);
-  delete[] transpose;
-}
-
-}

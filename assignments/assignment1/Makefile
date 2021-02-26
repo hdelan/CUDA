@@ -8,7 +8,7 @@ DEL_FILE= 	rm -f
 #Flags
 #PARALLEL	= -fopenmp
 #DEFINES		= -DWITH_OPENMP
-CFLAGS		= -W -Wall $(PARALLEL) $(DEFINES)
+CFLAGS		= -W -Wall -std=c++17 $(PARALLEL) $(DEFINES)
 CXXFLAGS	= -W -Wall $(PARALLEL) $(DEFINES)
 NVCCFLAGS	= -g -G --use_fast_math
 
@@ -23,10 +23,13 @@ INCPATH		= /usr/include/
 SOURCES		= cpu_calc.cc
 
 
-all: cpu_calc
+all: matrix cpu_calc
 
 cpu_calc: cpu_calc.cc
-	$(CXX) -o $@ $<
+	$(CXX) -o $@ $< $(CFLAGS)
+
+matrix: matrix.cc
+	$(CXX) -o $@ $< $(CFLAGS)
 
 clean:
 	-$(DEL_FILE) $(OBJECTS) $(TARGET)
