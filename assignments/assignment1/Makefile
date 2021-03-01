@@ -29,7 +29,7 @@ cpu_calc: cpu_calc.cc
 	$(CXX) -o $@ $^ $(CFLAGS)
 
 matrix: matrix.cc
-	$(CXX) -o $@ $< $(CFLAGS)
+	$(CXX) -pg -o $@ $< $(CFLAGS)
 
 
 clean:
