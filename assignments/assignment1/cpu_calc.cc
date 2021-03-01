@@ -8,24 +8,6 @@
 
 #define MAX_DIM 1000000
 
-class Matrix {
-  public:
-    Matrix() = delete;
-    Matrix(const int n, const int m) : nrows {n}, mcols {m}, data {new float[n*m]}{};
-    ~Matrix() { delete[] data; };
-    Matrix(Matrix & m) : Matrix(m.nrows, m.mcols){
-      for (int i = 0; i < nrows; ++i) {
-        for (int j = 0; j < mcols; ++j) {
-          data[i*mcols + j];
-        }
-      }
-    };
-  private:
-    int nrows, mcols;
-    float * data;
-};
-
-
 float * transpose_matrix(float *, float *, const int nrows, const int mcols);
 void sum_abs_rows(float *, float *, const int, const int);
 void sum_abs_cols(float *, float *, const int, const int);
@@ -58,24 +40,24 @@ int main(int argc, char * argv[]) {
 	srand48(seed);
 
   // Populate matrix with values from [-10.0, 10.0]
-  for (int i = 0; i < n*m; i++)
+  for (unsigned int i = 0; i < n*m; i++)
     matrix[i] = (float) (drand48()*20.0) - 10.0;
 
 
   std::cout << "\n\n";
-  print_matrix(matrix, n, m);
+  //print_matrix(matrix, n, m);
   float * transpose {new float[n*m]};
   transpose_matrix(matrix, transpose, n, m);
   std::cout << "\n\n";
-  print_matrix(transpose, m, n);
+  //print_matrix(transpose, m, n);
   float * row_sums {new float[m]};
   sum_abs_rows(matrix, row_sums, m, n);
   std::cout << "\n\nRow sums:\n\n";
-  print_matrix(row_sums, m, 1);
+  //print_matrix(row_sums, m, 1);
   float * col_sums {new float[n]};
   sum_abs_cols(matrix, col_sums, m, n);
   std::cout << "\n\nColumn Sums:\n\n";
-  print_matrix(col_sums, 1, n);
+  //print_matrix(col_sums, 1, n);
   std::cout << "\n\n";
 
   std::cout << "Sum of column sums: " << std::setprecision(8) << vector_reduction(col_sums, n) << std::endl;

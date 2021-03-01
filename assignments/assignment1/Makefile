@@ -21,15 +21,16 @@ INCPATH		= /usr/include/
 
 ####### Files
 SOURCES		= cpu_calc.cc
-
+OBJECTS		= cpu_calc matrix
 
 all: matrix cpu_calc
 
-cpu_calc: cpu_calc.cc
-	$(CXX) -o $@ $< $(CFLAGS)
+cpu_calc: cpu_calc.cc 
+	$(CXX) -o $@ $^ $(CFLAGS)
 
 matrix: matrix.cc
 	$(CXX) -o $@ $< $(CFLAGS)
+
 
 clean:
 	-$(DEL_FILE) $(OBJECTS) $(TARGET)
