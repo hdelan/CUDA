@@ -8,7 +8,7 @@
 int main(int argc, char * argv[]) {
 
   // Default values for n, m
-	unsigned int n {10}, m {10};
+	unsigned int n {10000}, m {10000};
   
   // A boolean variable will tell us whether or not we want to print time
   int print_time {0};

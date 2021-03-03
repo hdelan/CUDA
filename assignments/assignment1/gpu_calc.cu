@@ -5,10 +5,36 @@
 
 #include "matrix.h"
 
+/*
+__global__ float vector_reduction(const float * vector, const int N) {
+  float sum = 0.0;
+  for (int i = 0; i < N; ++i) {
+    sum += vector[i];
+  }
+  return sum;
+}
+*/
+
+__global__ void rowsum(int N, int M, float * A1dGPU, float * rowsumGPU) {
+  int idx = blockIdx.x*blockDim.x + threadIdx.x;
+  if (idx < N) {
+    for (int i=0; i < M; i++) 
+      rowsumGPU[idx] += A1dGPU[M*idx + i];
+  }
+}
+
+__global__ void colsum(int N, int M, float * A1dGPU, float * colsumGPU) {
+  int idx = blockIdx.x*blockDim.x + threadIdx.x;
+  if (idx < N) {
+    for (int i=0; i < M; i++) 
+      colsumGPU[idx] += A1dGPU[M*i+ idx];
+  }
+}
+
 int main(int argc, char * argv[]) {
 
   // Default values for n, m
-	unsigned int n {10}, m {10};
+	unsigned int n {1000}, m {1000};
   
   // A boolean variable will tell us whether or not we want to print time
   int print_time {0};
@@ -29,6 +55,7 @@ int main(int argc, char * argv[]) {
     A[i] = (float) drand48()*20.0 - 10.0;
 	
 
+
   //A.print_matrix();
   //A.transpose().print_matrix();
 
@@ -37,7 +64,7 @@ int main(int argc, char * argv[]) {
 
   //colsum.print_matrix();
   std::cout << "\n\nSum of colsums: " << colsum.sum_abs_matrix() << "\n\n";
-  rowsum.print_matrix();
+  //rowsum.print_matrix();
   std::cout << "\n\nSum of rowsums: " << rowsum.sum_abs_matrix() << "\n\n";
   
   if (print_time == 1) {
@@ -48,6 +75,7 @@ int main(int argc, char * argv[]) {
 	return 0;
 	
 }
+
 
 void parse_command_line(const int argc, char ** argv, unsigned int & n, unsigned int & m, long unsigned int & seed, struct timeval & start_time, int & print_time) {
   int c;
@@ -101,13 +129,6 @@ void parse_command_line(const int argc, char ** argv, unsigned int & n, unsigned
   }
 }
 
-float vector_reduction(const float * vector, const int n) {
-  float sum = 0.0;
-  for (int i = 0; i < n; ++i) {
-    sum += vector[i];
-  }
-  return sum;
-}
 
 #ifndef MATRIX_H
 #define MATRIX_H

@@ -2,35 +2,21 @@ Flat profile:
 
 Each sample counts as 0.01 seconds.
   %   cumulative   self              self     total           
- time   seconds   seconds    calls  ms/call  ms/call  name    
- 37.98      0.61     0.61        1   611.48   795.26  Matrix::sum_abs_cols()
- 20.55      0.94     0.33                             main
- 19.30      1.25     0.31 300010000     0.00     0.00  Matrix::operator[](int)
-  9.96      1.41     0.16 200000000     0.00     0.00  std::abs(float)
-  9.96      1.57     0.16        1   160.39   344.16  Matrix::sum_abs_rows()
-  2.49      1.61     0.04        1    40.10    40.10  Matrix::print_matrix()
-  0.00      1.61     0.00    10000     0.00     0.00  std::setw(int)
-  0.00      1.61     0.00        3     0.00     0.00  Matrix::Matrix(int, int)
-  0.00      1.61     0.00        3     0.00     0.00  Matrix::~Matrix()
-  0.00      1.61     0.00        2     0.00     0.00  Matrix::sum_abs_matrix()
-  0.00      1.61     0.00        2     0.00     0.00  bool __gnu_cxx::__is_null_pointer<char const>(char const*)
-  0.00      1.61     0.00        2     0.00     0.00  int __gnu_cxx::__stoa<long, int, char, int>(long (*)(char const*, char**, int), char const*, char const*, unsigned long*, int)
-  0.00      1.61     0.00        2     0.00     0.00  std::char_traits<char>::length(char const*)
-  0.00      1.61     0.00        2     0.00     0.00  void std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::_M_construct<char const*>(char const*, char const*)
-  0.00      1.61     0.00        2     0.00     0.00  void std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::_M_construct<char const*>(char const*, char const*, std::forward_iterator_tag)
-  0.00      1.61     0.00        2     0.00     0.00  void std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::_M_construct_aux<char const*>(char const*, char const*, std::__false_type)
-  0.00      1.61     0.00        2     0.00     0.00  std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::basic_string<std::allocator<char> >(char const*, std::allocator<char> const&)
-  0.00      1.61     0.00        2     0.00     0.00  std::__cxx11::stoi(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, unsigned long*, int)
-  0.00      1.61     0.00        2     0.00     0.00  std::iterator_traits<char const*>::difference_type std::__distance<char const*>(char const*, char const*, std::random_access_iterator_tag)
-  0.00      1.61     0.00        2     0.00     0.00  std::setprecision(int)
-  0.00      1.61     0.00        2     0.00     0.00  std::iterator_traits<char const*>::iterator_category std::__iterator_category<char const*>(char const* const&)
-  0.00      1.61     0.00        2     0.00     0.00  std::iterator_traits<char const*>::difference_type std::distance<char const*>(char const*, char const*)
-  0.00      1.61     0.00        2     0.00     0.00  __gnu_cxx::__stoa<long, int, char, int>(long (*)(char const*, char**, int), char const*, char const*, unsigned long*, int)::_Range_chk::_S_chk(long, std::integral_constant<bool, true>)
-  0.00      1.61     0.00        2     0.00     0.00  __gnu_cxx::__stoa<long, int, char, int>(long (*)(char const*, char**, int), char const*, char const*, unsigned long*, int)::_Save_errno::_Save_errno()
-  0.00      1.61     0.00        2     0.00     0.00  __gnu_cxx::__stoa<long, int, char, int>(long (*)(char const*, char**, int), char const*, char const*, unsigned long*, int)::_Save_errno::~_Save_errno()
-  0.00      1.61     0.00        1     0.00     0.00  _GLOBAL__sub_I_main
-  0.00      1.61     0.00        1     0.00     0.00  parse_command_line(int, char**, unsigned int&, unsigned int&, unsigned long&, timeval&, int&)
-  0.00      1.61     0.00        1     0.00     0.00  __static_initialization_and_destruction_0(int, int)
+ time   seconds   seconds    calls   s/call   s/call  name    
+ 38.90      0.78     0.78        1     0.78     1.00  Matrix::sum_abs_cols()
+ 20.95      1.20     0.42                             main
+ 16.96      1.54     0.34 300010000     0.00     0.00  Matrix::operator[](int)
+ 10.47      1.75     0.21 200000000     0.00     0.00  std::abs(float)
+  9.97      1.95     0.20        1     0.20     0.42  Matrix::sum_abs_rows()
+  2.99      2.01     0.06        1     0.06     0.06  Matrix::print_matrix()
+  0.00      2.01     0.00    10000     0.00     0.00  std::setw(int)
+  0.00      2.01     0.00        3     0.00     0.00  Matrix::Matrix(int, int)
+  0.00      2.01     0.00        3     0.00     0.00  Matrix::~Matrix()
+  0.00      2.01     0.00        2     0.00     0.00  Matrix::sum_abs_matrix()
+  0.00      2.01     0.00        1     0.00     0.00  _GLOBAL__sub_I_main
+  0.00      2.01     0.00        1     0.00     0.00  parse_command_line(int, char**, unsigned int&, unsigned int&, unsigned long&, timeval&, int&)
+  0.00      2.01     0.00        1     0.00     0.00  __static_initialization_and_destruction_0(int, int)
+  0.00      2.01     0.00        1     0.00     0.00  std::setprecision(int)
 
  %         the percentage of the total running time of the
 time       program used by this function.
@@ -68,46 +54,45 @@ notice and this notice are preserved.
 		     Call graph (explanation follows)
 
 
-granularity: each sample hit covers 2 byte(s) for 0.62% of 1.61 seconds
+granularity: each sample hit covers 2 byte(s) for 0.50% of 2.01 seconds
 
 index % time    self  children    called     name
                                                  <spontaneous>
-[1]    100.0    0.33    1.28                 main [1]
-                0.61    0.18       1/1           Matrix::sum_abs_cols() [2]
-                0.16    0.18       1/1           Matrix::sum_abs_rows() [3]
-                0.10    0.00 100000000/300010000     Matrix::operator[](int) [4]
-                0.04    0.00       1/1           Matrix::print_matrix() [6]
+[1]    100.0    0.42    1.59                 main [1]
+                0.78    0.22       1/1           Matrix::sum_abs_cols() [2]
+                0.20    0.22       1/1           Matrix::sum_abs_rows() [3]
+                0.11    0.00 100000000/300010000     Matrix::operator[](int) [4]
+                0.06    0.00       1/1           Matrix::print_matrix() [6]
                 0.00    0.00       3/3           Matrix::~Matrix() [15]
                 0.00    0.00       2/2           Matrix::sum_abs_matrix() [16]
-                0.00    0.00       1/1           parse_command_line(int, char**, unsigned int&, unsigned int&, unsigned long&, timeval&, int&) [33]
-                0.00    0.00       1/3           Matrix::Matrix(int, int) [14]
-                0.00    0.00       1/2           std::setprecision(int) [26]
------------------------------------------------
-                0.61    0.18       1/1           main [1]
-[2]     49.3    0.61    0.18       1         Matrix::sum_abs_cols() [2]
-                0.10    0.00 100010000/300010000     Matrix::operator[](int) [4]
-                0.08    0.00 100000000/200000000     std::abs(float) [5]
+                0.00    0.00       1/1           parse_command_line(int, char**, unsigned int&, unsigned int&, unsigned long&, timeval&, int&) [18]
                 0.00    0.00       1/3           Matrix::Matrix(int, int) [14]
 -----------------------------------------------
-                0.16    0.18       1/1           main [1]
-[3]     21.3    0.16    0.18       1         Matrix::sum_abs_rows() [3]
-                0.10    0.00 100000000/300010000     Matrix::operator[](int) [4]
-                0.08    0.00 100000000/200000000     std::abs(float) [5]
+                0.78    0.22       1/1           main [1]
+[2]     49.7    0.78    0.22       1         Matrix::sum_abs_cols() [2]
+                0.11    0.00 100010000/300010000     Matrix::operator[](int) [4]
+                0.11    0.00 100000000/200000000     std::abs(float) [5]
                 0.00    0.00       1/3           Matrix::Matrix(int, int) [14]
 -----------------------------------------------
-                0.10    0.00 100000000/300010000     main [1]
-                0.10    0.00 100000000/300010000     Matrix::sum_abs_rows() [3]
-                0.10    0.00 100010000/300010000     Matrix::sum_abs_cols() [2]
-[4]     19.3    0.31    0.00 300010000         Matrix::operator[](int) [4]
+                0.20    0.22       1/1           main [1]
+[3]     20.8    0.20    0.22       1         Matrix::sum_abs_rows() [3]
+                0.11    0.00 100000000/300010000     Matrix::operator[](int) [4]
+                0.11    0.00 100000000/200000000     std::abs(float) [5]
+                0.00    0.00       1/3           Matrix::Matrix(int, int) [14]
 -----------------------------------------------
-                0.08    0.00 100000000/200000000     Matrix::sum_abs_rows() [3]
-                0.08    0.00 100000000/200000000     Matrix::sum_abs_cols() [2]
-[5]      9.9    0.16    0.00 200000000         std::abs(float) [5]
+                0.11    0.00 100000000/300010000     main [1]
+                0.11    0.00 100000000/300010000     Matrix::sum_abs_rows() [3]
+                0.11    0.00 100010000/300010000     Matrix::sum_abs_cols() [2]
+[4]     16.9    0.34    0.00 300010000         Matrix::operator[](int) [4]
 -----------------------------------------------
-                0.04    0.00       1/1           main [1]
-[6]      2.5    0.04    0.00       1         Matrix::print_matrix() [6]
+                0.11    0.00 100000000/200000000     Matrix::sum_abs_rows() [3]
+                0.11    0.00 100000000/200000000     Matrix::sum_abs_cols() [2]
+[5]     10.4    0.21    0.00 200000000         std::abs(float) [5]
+-----------------------------------------------
+                0.06    0.00       1/1           main [1]
+[6]      3.0    0.06    0.00       1         Matrix::print_matrix() [6]
                 0.00    0.00   10000/10000       std::setw(int) [13]
-                0.00    0.00       1/2           std::setprecision(int) [26]
+                0.00    0.00       1/1           std::setprecision(int) [20]
 -----------------------------------------------
                 0.00    0.00   10000/10000       Matrix::print_matrix() [6]
 [13]     0.0    0.00    0.00   10000         std::setw(int) [13]
@@ -123,75 +108,18 @@ index % time    self  children    called     name
                 0.00    0.00       2/2           main [1]
 [16]     0.0    0.00    0.00       2         Matrix::sum_abs_matrix() [16]
 -----------------------------------------------
-                0.00    0.00       2/2           void std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::_M_construct<char const*>(char const*, char const*, std::forward_iterator_tag) [21]
-[17]     0.0    0.00    0.00       2         bool __gnu_cxx::__is_null_pointer<char const>(char const*) [17]
------------------------------------------------
-                0.00    0.00       2/2           std::__cxx11::stoi(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, unsigned long*, int) [24]
-[18]     0.0    0.00    0.00       2         int __gnu_cxx::__stoa<long, int, char, int>(long (*)(char const*, char**, int), char const*, char const*, unsigned long*, int) [18]
-                0.00    0.00       2/2           __gnu_cxx::__stoa<long, int, char, int>(long (*)(char const*, char**, int), char const*, char const*, unsigned long*, int)::_Save_errno::_Save_errno() [30]
-                0.00    0.00       2/2           __gnu_cxx::__stoa<long, int, char, int>(long (*)(char const*, char**, int), char const*, char const*, unsigned long*, int)::_Range_chk::_S_chk(long, std::integral_constant<bool, true>) [29]
-                0.00    0.00       2/2           __gnu_cxx::__stoa<long, int, char, int>(long (*)(char const*, char**, int), char const*, char const*, unsigned long*, int)::_Save_errno::~_Save_errno() [31]
------------------------------------------------
-                0.00    0.00       2/2           std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::basic_string<std::allocator<char> >(char const*, std::allocator<char> const&) [23]
-[19]     0.0    0.00    0.00       2         std::char_traits<char>::length(char const*) [19]
------------------------------------------------
-                0.00    0.00       2/2           std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::basic_string<std::allocator<char> >(char const*, std::allocator<char> const&) [23]
-[20]     0.0    0.00    0.00       2         void std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::_M_construct<char const*>(char const*, char const*) [20]
-                0.00    0.00       2/2           void std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::_M_construct_aux<char const*>(char const*, char const*, std::__false_type) [22]
------------------------------------------------
-                0.00    0.00       2/2           void std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::_M_construct_aux<char const*>(char const*, char const*, std::__false_type) [22]
-[21]     0.0    0.00    0.00       2         void std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::_M_construct<char const*>(char const*, char const*, std::forward_iterator_tag) [21]
-                0.00    0.00       2/2           bool __gnu_cxx::__is_null_pointer<char const>(char const*) [17]
-                0.00    0.00       2/2           std::iterator_traits<char const*>::difference_type std::distance<char const*>(char const*, char const*) [28]
------------------------------------------------
-                0.00    0.00       2/2           void std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::_M_construct<char const*>(char const*, char const*) [20]
-[22]     0.0    0.00    0.00       2         void std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::_M_construct_aux<char const*>(char const*, char const*, std::__false_type) [22]
-                0.00    0.00       2/2           void std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::_M_construct<char const*>(char const*, char const*, std::forward_iterator_tag) [21]
------------------------------------------------
-                0.00    0.00       2/2           parse_command_line(int, char**, unsigned int&, unsigned int&, unsigned long&, timeval&, int&) [33]
-[23]     0.0    0.00    0.00       2         std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::basic_string<std::allocator<char> >(char const*, std::allocator<char> const&) [23]
-                0.00    0.00       2/2           std::char_traits<char>::length(char const*) [19]
-                0.00    0.00       2/2           void std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::_M_construct<char const*>(char const*, char const*) [20]
------------------------------------------------
-                0.00    0.00       2/2           parse_command_line(int, char**, unsigned int&, unsigned int&, unsigned long&, timeval&, int&) [33]
-[24]     0.0    0.00    0.00       2         std::__cxx11::stoi(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, unsigned long*, int) [24]
-                0.00    0.00       2/2           int __gnu_cxx::__stoa<long, int, char, int>(long (*)(char const*, char**, int), char const*, char const*, unsigned long*, int) [18]
------------------------------------------------
-                0.00    0.00       2/2           std::iterator_traits<char const*>::difference_type std::distance<char const*>(char const*, char const*) [28]
-[25]     0.0    0.00    0.00       2         std::iterator_traits<char const*>::difference_type std::__distance<char const*>(char const*, char const*, std::random_access_iterator_tag) [25]
------------------------------------------------
-                0.00    0.00       1/2           main [1]
-                0.00    0.00       1/2           Matrix::print_matrix() [6]
-[26]     0.0    0.00    0.00       2         std::setprecision(int) [26]
------------------------------------------------
-                0.00    0.00       2/2           std::iterator_traits<char const*>::difference_type std::distance<char const*>(char const*, char const*) [28]
-[27]     0.0    0.00    0.00       2         std::iterator_traits<char const*>::iterator_category std::__iterator_category<char const*>(char const* const&) [27]
------------------------------------------------
-                0.00    0.00       2/2           void std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::_M_construct<char const*>(char const*, char const*, std::forward_iterator_tag) [21]
-[28]     0.0    0.00    0.00       2         std::iterator_traits<char const*>::difference_type std::distance<char const*>(char const*, char const*) [28]
-                0.00    0.00       2/2           std::iterator_traits<char const*>::iterator_category std::__iterator_category<char const*>(char const* const&) [27]
-                0.00    0.00       2/2           std::iterator_traits<char const*>::difference_type std::__distance<char const*>(char const*, char const*, std::random_access_iterator_tag) [25]
------------------------------------------------
-                0.00    0.00       2/2           int __gnu_cxx::__stoa<long, int, char, int>(long (*)(char const*, char**, int), char const*, char const*, unsigned long*, int) [18]
-[29]     0.0    0.00    0.00       2         __gnu_cxx::__stoa<long, int, char, int>(long (*)(char const*, char**, int), char const*, char const*, unsigned long*, int)::_Range_chk::_S_chk(long, std::integral_constant<bool, true>) [29]
------------------------------------------------
-                0.00    0.00       2/2           int __gnu_cxx::__stoa<long, int, char, int>(long (*)(char const*, char**, int), char const*, char const*, unsigned long*, int) [18]
-[30]     0.0    0.00    0.00       2         __gnu_cxx::__stoa<long, int, char, int>(long (*)(char const*, char**, int), char const*, char const*, unsigned long*, int)::_Save_errno::_Save_errno() [30]
------------------------------------------------
-                0.00    0.00       2/2           int __gnu_cxx::__stoa<long, int, char, int>(long (*)(char const*, char**, int), char const*, char const*, unsigned long*, int) [18]
-[31]     0.0    0.00    0.00       2         __gnu_cxx::__stoa<long, int, char, int>(long (*)(char const*, char**, int), char const*, char const*, unsigned long*, int)::_Save_errno::~_Save_errno() [31]
------------------------------------------------
                 0.00    0.00       1/1           __libc_csu_init [42]
-[32]     0.0    0.00    0.00       1         _GLOBAL__sub_I_main [32]
-                0.00    0.00       1/1           __static_initialization_and_destruction_0(int, int) [34]
+[17]     0.0    0.00    0.00       1         _GLOBAL__sub_I_main [17]
+                0.00    0.00       1/1           __static_initialization_and_destruction_0(int, int) [19]
 -----------------------------------------------
                 0.00    0.00       1/1           main [1]
-[33]     0.0    0.00    0.00       1         parse_command_line(int, char**, unsigned int&, unsigned int&, unsigned long&, timeval&, int&) [33]
-                0.00    0.00       2/2           std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::basic_string<std::allocator<char> >(char const*, std::allocator<char> const&) [23]
-                0.00    0.00       2/2           std::__cxx11::stoi(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, unsigned long*, int) [24]
+[18]     0.0    0.00    0.00       1         parse_command_line(int, char**, unsigned int&, unsigned int&, unsigned long&, timeval&, int&) [18]
 -----------------------------------------------
-                0.00    0.00       1/1           _GLOBAL__sub_I_main [32]
-[34]     0.0    0.00    0.00       1         __static_initialization_and_destruction_0(int, int) [34]
+                0.00    0.00       1/1           _GLOBAL__sub_I_main [17]
+[19]     0.0    0.00    0.00       1         __static_initialization_and_destruction_0(int, int) [19]
+-----------------------------------------------
+                0.00    0.00       1/1           Matrix::print_matrix() [6]
+[20]     0.0    0.00    0.00       1         std::setprecision(int) [20]
 -----------------------------------------------
 
  This table describes the call tree of the program, and was sorted by
@@ -284,13 +212,8 @@ notice and this notice are preserved.
 
 Index by function name
 
-  [32] _GLOBAL__sub_I_main    [17] bool __gnu_cxx::__is_null_pointer<char const>(char const*) [27] std::iterator_traits<char const*>::iterator_category std::__iterator_category<char const*>(char const* const&)
-  [33] parse_command_line(int, char**, unsigned int&, unsigned int&, unsigned long&, timeval&, int&) [18] int __gnu_cxx::__stoa<long, int, char, int>(long (*)(char const*, char**, int), char const*, char const*, unsigned long*, int) [5] std::abs(float)
-  [34] __static_initialization_and_destruction_0(int, int) [19] std::char_traits<char>::length(char const*) [13] std::setw(int)
-   [6] Matrix::print_matrix() [20] void std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::_M_construct<char const*>(char const*, char const*) [28] std::iterator_traits<char const*>::difference_type std::distance<char const*>(char const*, char const*)
-   [2] Matrix::sum_abs_cols() [21] void std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::_M_construct<char const*>(char const*, char const*, std::forward_iterator_tag) [29] __gnu_cxx::__stoa<long, int, char, int>(long (*)(char const*, char**, int), char const*, char const*, unsigned long*, int)::_Range_chk::_S_chk(long, std::integral_constant<bool, true>)
-   [3] Matrix::sum_abs_rows() [22] void std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::_M_construct_aux<char const*>(char const*, char const*, std::__false_type) [30] __gnu_cxx::__stoa<long, int, char, int>(long (*)(char const*, char**, int), char const*, char const*, unsigned long*, int)::_Save_errno::_Save_errno()
-  [16] Matrix::sum_abs_matrix() [23] std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::basic_string<std::allocator<char> >(char const*, std::allocator<char> const&) [31] __gnu_cxx::__stoa<long, int, char, int>(long (*)(char const*, char**, int), char const*, char const*, unsigned long*, int)::_Save_errno::~_Save_errno()
-  [14] Matrix::Matrix(int, int) [24] std::__cxx11::stoi(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, unsigned long*, int) [1] main
-  [15] Matrix::~Matrix()      [25] std::iterator_traits<char const*>::difference_type std::__distance<char const*>(char const*, char const*, std::random_access_iterator_tag)
-   [4] Matrix::operator[](int) [26] std::setprecision(int)
+  [17] _GLOBAL__sub_I_main     [3] Matrix::sum_abs_rows() [20] std::setprecision(int)
+  [18] parse_command_line(int, char**, unsigned int&, unsigned int&, unsigned long&, timeval&, int&) [16] Matrix::sum_abs_matrix() [5] std::abs(float)
+  [19] __static_initialization_and_destruction_0(int, int) [14] Matrix::Matrix(int, int) [13] std::setw(int)
+   [6] Matrix::print_matrix() [15] Matrix::~Matrix()       [1] main
+   [2] Matrix::sum_abs_cols()  [4] Matrix::operator[](int)
