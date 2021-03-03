@@ -89,12 +89,17 @@ class Matrix {
 };
 
 class Matrix_GPU : public Matrix {
+public:
     Matrix_GPU() = delete;
     Matrix_GPU(const int n, const int m) : Matrix(n, m), block_size{BLOCK_SIZE} {
 	    cudaMalloc((void **) &data_GPU, sizeof(float)*n*m);
-    	    };
+	    dim3 dimBlock(block_size);
+	    dim3 dimGrid ( (N/dimBlock.x) + (!(N%dimBlock.x)?0:1) );
+    };
     Matrix_GPU(const int n, const int m, int block_size) : Matrix(n, m), block_size {block_size} {
 	    cudaMalloc((void **) &data_GPU, sizeof(float)*n*m);
+	    dim3 dimBlock(block_size);
+	    dim3 dimGrid ( (N/dimBlock.x) + (!(N%dimBlock.x)?0:1) );
     	    };
     ~Matrix() { free(data_GPU);};
 
@@ -103,8 +108,38 @@ class Matrix_GPU : public Matrix {
     }
 
     void data_from_GPU() {
-	cudaMemcpy(data, data_GPU, sizeof(float)*N*M
-  private:
+	cudaMemcpy(data, data_GPU, sizeof(float)*N*M, cudaMemcpyDeviceToHost);
+    }
+    
+    Matrix_GPU sum_abs_rows_GPU() {
+      // The return value will be the matrix of rowsums
+      Matrix_GPU rowsum(N, 1);
+      for (int i = 0; i < N; ++i) {
+        rowsum.data[i] = 0;
+        for (int j = 0; j < M; ++j) {
+          rowsum[i] += std::abs(data[i*N + j]);
+        }
+      }
+      return rowsum;
+    };
+
+    Matrix_GPU sum_abs_cols_GPU() {
+      Matrix colsum(M, 1);
+      for (int i = 0; i < M; ++i) {
+        colsum[i] = 0;
+        for (int j = 0; j < M; ++j) {
+          colsum[i] += std::abs(data[j*N + i]);
+        }
+      }
+      return colsum;
+    
+    };
+
+
+
+private:
     float * dataGPU;
     int block_size;
+};
+
 #endif
