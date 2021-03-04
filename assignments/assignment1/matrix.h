@@ -120,24 +120,14 @@ public:
 	cudaMemcpy(data, data_GPU, sizeof(float)*N*M, cudaMemcpyDeviceToHost);
     };
     
-    float & operator[](int i){
-      return data_GPU[i];
-    };
-    
-    Matrix_GPU rowsum_GPU() {
+    float * rowsum_GPU() {
         float * rowsum_GPU;
 	cudaMalloc((void **) &rowsum_GPU, sizeof(float)*N*1);
         int block_size = BLOCK_SIZE;
         dim3 dimBlock(block_size);
 	dim3 dimGrid((N/dimBlock.x) + (!(N%dimBlock.x)?0:1));
         sum_abs_rows_GPU<<<dimGrid, dimBlock>>>(data_GPU, rowsum_GPU, N, M);
-        Matrix_GPU rowsum_Matrix(N, 1);
-        for (int i = 0; i < N; ++i) {
-                rowsum_Matrix[i] = rowsum_GPU[i];
-        }
-
-        rowsum_Matrix.data_from_GPU();
-        return rowsum_Matrix;
+        return rowsum_GPU;
     };
 
 private:

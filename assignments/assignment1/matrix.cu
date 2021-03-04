@@ -8,15 +8,17 @@
 int main(int argc, char * argv[]) {
 
   // Default values for n, m
-  unsigned int n {10000}, m {10000};
-  
+  unsigned int n {10}, m {10};
+  int i = 0;
   // A boolean variable will tell us whether or not we want to print time
   int print_time {0};
   struct timeval start_time;
  
   // Default seed
   long unsigned int seed {123456};
-  
+
+  std::cout << i << std::endl;
+  i++;
   // Get optional parameters
   parse_command_line(argc, argv, n, m, seed, start_time, print_time);
   
@@ -25,12 +27,22 @@ int main(int argc, char * argv[]) {
   
   // Populate matrix with values from [-10.0, 10.0]
   Matrix_GPU A(n, m);
+  std::cout << i << std::endl;
+  i++;
   for (unsigned int i = 0; i < n*m; i++)
     A[i] = (float) drand48()*20.0 - 10.0;
 	
+  std::cout << i << std::endl;
+  i++;
   A.print_matrix();
   A.data_to_GPU();
-  Matrix_GPU rowsum {A.rowsum_GPU()};
+  std::cout << i << std::endl;
+  i++;
+  float * rowsum_GPU {A.rowsum_GPU()};
+  float * rowsum {(float *) malloc(sizeof(float)*m)};
+  cudaMemcpy(rowsum, rowsum_GPU, sizeof(float)*m, cudaMemcpyHostToDevice);
+  std::cout << i << std::endl;
+  i++;
   rowsum.print_matrix();
 
 
