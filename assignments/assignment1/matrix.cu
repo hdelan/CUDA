@@ -43,7 +43,13 @@ int main(int argc, char * argv[]) {
   cudaMemcpy(rowsum, rowsum_GPU, sizeof(float)*m, cudaMemcpyHostToDevice);
   std::cout << i << std::endl;
   i++;
-  rowsum.print_matrix();
+  for (int j = 0; j < n; j++)
+          std::cout << rowsum[j] << "\n";
+        
+  std::cout << i << std::endl;
+  i++;
+  //free(rowsum); free(rowsum_GPU);
+  return 0;
 
 
   /*
