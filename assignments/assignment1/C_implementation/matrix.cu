@@ -29,6 +29,8 @@ int main(int argc, char * argv[]) {
   for (unsigned int i = 0; i < N*M; i++)
     A[i] = (float) drand48()*20.0 - 10.0;  
 
+  std::setfill('~');
+  std::cout << std::setw(24) << "CPU" << 
   print_matrix_CPU(A, N, M);
 
   float * rowsum {(float *) malloc(sizeof(float) * N)};
@@ -39,7 +41,9 @@ int main(int argc, char * argv[]) {
   
   sum_abs_cols_CPU(A, colsum, N, M);
   print_matrix_CPU(colsum, 1, M);
-  
+ 
+  std::cout << "Sum of rowsums: " << vector_reduction_CPU(rowsum, N) << std::endl;
+  std::cout << "Sum of colsums: " << vector_reduction_CPU(colsum, M) << std::endl;
   return 0;
 }
 

@@ -55,7 +55,7 @@ void sum_abs_cols_CPU(float * matrix, float * colsum, int N, int M) {
     for (int i = 0; i < M; ++i) {
         colsum[i] = 0;
         for (int j = 0; j < N; ++j) {
-            colsum[i] += std::abs(matrix[j*N + i]);
+            colsum[i] += std::abs(matrix[j*M + i]);
         }
     }
 }
