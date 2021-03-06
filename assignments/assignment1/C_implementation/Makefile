@@ -18,6 +18,8 @@ INCPATH		= /usr/include/
 #CFLAGS=-lGL -lglut -lpthread -llibtiff  -O3 -finline-functions -ffast-math -fomit-frame-pointer -funroll-loops
 #CXXFLAGS=-lGL -lglut -lpthread -llibtiff  -O3 -finline-functions -ffast-math -fomit-frame-pointer -funroll-loops
 
+OBJECTS = matrix_funcs.o
+TARGETS = matrix
 
 all: matrix
 
