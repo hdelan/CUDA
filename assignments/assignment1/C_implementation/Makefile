@@ -21,6 +21,9 @@ INCPATH		= /usr/include/
 
 all: matrix
 
+OBJECTS 	= matrix_funcs.o
+TARGET 		= matrix 
+
 matrix: matrix.cu matrix_funcs.o matrix.h
 	$(NVCC) -o $@ matrix.cu matrix_funcs.o 
 

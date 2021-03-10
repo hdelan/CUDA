@@ -6,7 +6,7 @@
 
 #include "matrix.h"
 
-unsigned int MAX_DIM = 100000;
+unsigned int MAX_DIM = 1000000;
 
 // KERNELS
 __global__ void sum_abs_rows_GPU(float * data, float * rowsum, int N, int M) {
@@ -114,6 +114,10 @@ void parse_command_line(const int argc, char ** argv, unsigned int & n, unsigned
 }
 
 void print_matrix_CPU(float * A, const unsigned int N, const unsigned int M) {
+	if (N > 100 || M > 100) {
+		return;
+	}	
+
 	for (int i = 0; i < N; i++) {
 		std::cout << " | ";
 		for (int j = 0; j < M; j++) 
