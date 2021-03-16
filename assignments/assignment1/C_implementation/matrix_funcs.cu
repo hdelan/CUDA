@@ -10,7 +10,7 @@ unsigned int MAX_DIM = 1000000;
 
 // KERNELS
 __global__ void sum_abs_rows_GPU(float * data, float * rowsum, int N, int M) {
-        int idx=blockIdx.x*blockDim.x + threadIdx.x;
+        int idx = blockIdx.x*blockDim.x + threadIdx.x;
         rowsum[idx] = 0.0;
         if (idx < N) {
                 for (int j = 0; j < M; ++j) {
@@ -20,7 +20,7 @@ __global__ void sum_abs_rows_GPU(float * data, float * rowsum, int N, int M) {
 }
 
 __global__ void sum_abs_cols_GPU(float * data, float * colsum, int N, int M) {
-        int idx=blockIdx.x*blockDim.x + threadIdx.x;
+        int idx = blockIdx.x*blockDim.x + threadIdx.x;
         colsum[idx] = 0.0;
         if (idx < N) {
                 for (int j = 0; j < M; ++j) {
@@ -29,6 +29,43 @@ __global__ void sum_abs_cols_GPU(float * data, float * colsum, int N, int M) {
         }
 }
 
+__global__ void reduce0_GPU(float * vector, float * alt_vector, int N) {
+	int stride = blockDim.x * gridDim.x;
+	int idx = blockIdx.x*blockDim.x + threadIdx.x;
+	int index = idx;
+	alt_vector[idx] = 0.0f;
+	while (index < N) {
+		alt_vector[idx] += vector[index];
+		index += stride;
+	}
+}
+
+
+__global__ float reduce1_GPU(float * alt_vector,  int N) {
+	int stride = blockDim.x;
+	int idx = blockIdx.x*blockDim.x + threadIdx.x;
+	if (idx >= stride) {
+		return;
+	}
+	int index = idx + stride;
+	while (index < N) {
+		alt_vector[idx] += alt_vector[index];
+		index += stride;
+	}
+}
+
+void vector_reduction_GPU(float * vector, int N) {
+	// stride is the number of active threads, which will reduce for each iteration
+	// of the while loop
+	float threadsum
+	while (index < N){
+		altvector[idx] = 0;
+		index = idx;
+		while (index < vecsize) {
+			alt_vector[idx] += vector[index];
+			index += stride;
+		}
+	
 
 // CPU FUNCTIONS
 float vector_reduction_CPU(const float * vector, const int n) {
