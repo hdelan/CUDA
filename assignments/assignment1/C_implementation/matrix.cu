@@ -84,6 +84,7 @@ int main(int argc, char * argv[]) {
   std::cout << "Rowsums: \n";
   print_matrix_CPU(rowsum, N, 1);
   std::cout << "Sum of rowsums: " << vector_reduction_CPU(rowsum, N) << std::endl;
+  std::cout << "Sum of rowsums: " << vector_reduction_GPU(rowsum, N, dimBlock, dimGrid) << std::endl;
   
   std::cout << "Column sums: \n";
   print_matrix_CPU(colsum, 1, M);

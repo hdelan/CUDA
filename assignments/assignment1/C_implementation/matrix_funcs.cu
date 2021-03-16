@@ -29,43 +29,42 @@ __global__ void sum_abs_cols_GPU(float * data, float * colsum, int N, int M) {
         }
 }
 
-__global__ void reduce0_GPU(float * vector, float * alt_vector, int N) {
-	int stride = blockDim.x * gridDim.x;
+__global__ void reduce0_GPU(float * vector_GPU, int N) {
+	int stride = blockDim.x*gridDim.x;
 	int idx = blockIdx.x*blockDim.x + threadIdx.x;
-	int index = idx;
-	alt_vector[idx] = 0.0f;
+	int index = idx + stride;
 	while (index < N) {
-		alt_vector[idx] += vector[index];
+		vector_GPU[idx] += vector_GPU[index];
 		index += stride;
 	}
 }
 
 
-__global__ float reduce1_GPU(float * alt_vector,  int N) {
+__global__ void reduce1_GPU(float * vector) {
 	int stride = blockDim.x;
 	int idx = blockIdx.x*blockDim.x + threadIdx.x;
 	if (idx >= stride) {
 		return;
 	}
 	int index = idx + stride;
-	while (index < N) {
-		alt_vector[idx] += alt_vector[index];
+	while (index < blockDim.x*gridDim.x) {
+		vector_GPU[idx] += vector_GPU[index];
 		index += stride;
+	}
+	__syncthreads();
+	if (idx == 0) {
+		for (int i = 1; i < blockDim.x; i++)
+			vector_GPU[idx] += vector_GPU[i];
 	}
 }
 
-void vector_reduction_GPU(float * vector, int N) {
-	// stride is the number of active threads, which will reduce for each iteration
-	// of the while loop
-	float threadsum
-	while (index < N){
-		altvector[idx] = 0;
-		index = idx;
-		while (index < vecsize) {
-			alt_vector[idx] += vector[index];
-			index += stride;
-		}
-	
+float vector_reduction_GPU(float * vector_GPU, int N, dim3 dimBlock, dim3 dimGrid) {
+	reduce0_GPU<<<dimGrid, dimBlock>>>(vector_GPU, N);
+	reduce1_GPU<<<dimGrid, dimBlock>>>(vector_GPU);
+	float ans;
+	cudaMemcpy(ans, vector_GPU[0], sizeof(float), cudaMemcpyDeviceToHost);
+	return ans;
+}
 
 // CPU FUNCTIONS
 float vector_reduction_CPU(const float * vector, const int n) {
