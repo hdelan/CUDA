@@ -2,8 +2,12 @@
 #define MATRIX_H
 
 // KERNELS
-__global__ void sum_abs_rows_GPU(float * data, float * rowsum, int N, int M);
-__global__ void sum_abs_cols_GPU(float * data, float * colsum, int N, int M);
+__global__ void sum_abs_rows_GPU(float * data, float * rowsum, const int N, const int M);
+__global__ void sum_abs_cols_GPU(float * data, float * colsum, const int N, const int M);
+__global__ void reduce0_GPU(float * vector_GPU, const int N);
+__global__ void reduce1_GPU(float * vector_GPU, const int N);
+
+float vector_reduction_GPU(float * vector_GPU, const int N, dim3 dimBlock, dim3 dimGrid);
 
 // CPU MATRIX FUNCTIONS
 float vector_reduction_CPU(const float * vector, const int n); 
