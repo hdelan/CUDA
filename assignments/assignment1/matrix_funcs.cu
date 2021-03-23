@@ -47,7 +47,7 @@ __global__ void reduce1_GPU(float * vector_GPU, const int N) {
 		return;
 	}
 	int index = idx + stride;
-	while (index < blockDim.x*gridDim.x) {
+	while (index < blockDim.x*gridDim.x && index < N) {
 		vector_GPU[idx] += vector_GPU[index];
 		index += stride;
 	}
