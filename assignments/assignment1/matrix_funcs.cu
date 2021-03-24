@@ -97,7 +97,7 @@ void sum_abs_cols_CPU(float * matrix, float * colsum, int N, int M) {
 }
 
 // HELPER FUNCTIONS
-void parse_command_line(const int argc, char ** argv, unsigned int & n, unsigned int & m, long unsigned int & seed, struct timeval & start_time, int & print_time) {
+void parse_command_line(const int argc, char ** argv, unsigned int & n, unsigned int & m, long unsigned int & seed, struct timeval & start_time, int & print_time, int & block_size) {
   int c;
   unsigned int tmp;
 
@@ -106,7 +106,7 @@ void parse_command_line(const int argc, char ** argv, unsigned int & n, unsigned
   // m - dimension of m
   // r - seed RNG with time(NULL)
   // h - help
-  while ((c = getopt(argc, argv, "n:m:rth")) != -1) {
+  while ((c = getopt(argc, argv, "n:m:b:rth")) != -1) {
     switch(c) {
       case 'n':
         tmp = std::stoi(optarg); 
@@ -126,6 +126,14 @@ void parse_command_line(const int argc, char ** argv, unsigned int & n, unsigned
         }
         break;
 
+      case 'b':
+	tmp = std::stoi(optarg);
+	if ((tmp > 1) && (tmp < 1025)) {
+		block_size = tmp;
+	} else {
+  	  std::cout << "Invalid block size, using default " << block_size << std::endl;
+	}
+	break;
         // Seed the RNG with microsecond time
       case 'r':
         gettimeofday(&start_time, NULL);
