@@ -1,6 +1,6 @@
 #!/bin/bash
 
-block_size=16
+block_size=128
 
 echo "Running for block size $block_size"
 [[ -e output/$block_size.txt ]] && rm output/$block_size.txt
