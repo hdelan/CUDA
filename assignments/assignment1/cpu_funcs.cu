@@ -6,6 +6,8 @@
 
 #include "matrix.h"
 
+unsigned int MAX_DIM = 100000;
+
 // CPU FUNCTIONS
 float vector_reduction_CPU(const float * vector, const int n) {
   float sum = 0.0f;

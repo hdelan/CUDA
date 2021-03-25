@@ -19,7 +19,7 @@ int main(int argc, char * argv[]) {
   struct timeval start_time, cpu_time_rowsum, cpu_time_colsum, cpu_time_reduction, gpu_time_rowsum, gpu_time_colsum, gpu_time_reduction, cpu_time_rowsum1, cpu_time_colsum1, cpu_time_reduction1, gpu_time_rowsum1, gpu_time_colsum1, gpu_time_reduction1;
  
   // Default seed
-  long unsigned int seed {123456};
+  long unsigned int seed {1234};
   
   // Get optional parameters
   parse_command_line(argc, argv, N, M, seed, start_time, print_time, block_size);
