@@ -12,7 +12,7 @@ unsigned int MAX_DIM = 1000000;
 __global__ void sum_abs_rows_GPU(float * data, float * rowsum, const int N, const int M) {
         int idx = blockIdx.x*blockDim.x + threadIdx.x;
         if (idx < N) {
-        	rowsum[idx] = 0.0;
+        	rowsum[idx] = 0.0f;
                 for (int j = 0; j < M; ++j) {
                         rowsum[idx] += std::abs(data[idx*M + j]);
                 }
@@ -22,7 +22,7 @@ __global__ void sum_abs_rows_GPU(float * data, float * rowsum, const int N, cons
 __global__ void sum_abs_cols_GPU(float * data, float * colsum, const int N, const int M) {
         int idx = blockIdx.x*blockDim.x + threadIdx.x;
         if (idx < M) {
-        	colsum[idx] = 0.0;
+        	colsum[idx] = 0.0f;
                 for (int j = 0; j < N; ++j) {
                         colsum[idx] += std::abs(data[j*M + idx]);
                 }
@@ -68,7 +68,7 @@ float vector_reduction_GPU(float * vector_GPU, const int N, dim3 dimBlock, dim3 
 
 // CPU FUNCTIONS
 float vector_reduction_CPU(const float * vector, const int n) {
-  float sum = 0.0;
+  float sum = 0.0f;
   for (int i = 0; i < n; ++i) {
     sum += vector[i];
   }
@@ -79,7 +79,7 @@ float vector_reduction_CPU(const float * vector, const int n) {
 void sum_abs_rows_CPU(float * matrix, float * rowsum, int N, int M) {
     // The return value will be the matrix of rowsums
     for (int i = 0; i < N; ++i) {
-        rowsum[i] = 0;
+        rowsum[i] = 0.0f;
         for (int j = 0; j < M; ++j) {
             rowsum[i] += std::abs(matrix[i*M + j]);
         }
@@ -89,7 +89,7 @@ void sum_abs_rows_CPU(float * matrix, float * rowsum, int N, int M) {
 void sum_abs_cols_CPU(float * matrix, float * colsum, int N, int M) {
     // The return value will be the matrix of rowsums
     for (int i = 0; i < M; ++i) {
-        colsum[i] = 0;
+        colsum[i] = 0.0f;
         for (int j = 0; j < N; ++j) {
             colsum[i] += std::abs(matrix[j*M + i]);
         }
@@ -97,7 +97,7 @@ void sum_abs_cols_CPU(float * matrix, float * colsum, int N, int M) {
 }
 
 // HELPER FUNCTIONS
-void parse_command_line(const int argc, char ** argv, unsigned int & n, unsigned int & m, long unsigned int & seed, struct timeval & start_time, int & print_time, int & block_size) {
+void parse_command_line(const int argc, char ** argv, unsigned int & n, unsigned int & m, long unsigned int & seed, struct timeval & start_time, int & print_time, unsigned int & block_size) {
   int c;
   unsigned int tmp;
 

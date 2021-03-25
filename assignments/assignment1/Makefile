@@ -10,7 +10,7 @@ DEL_FILE= 	rm -f
 #DEFINES		= -DWITH_OPENMP
 CFLAGS		= -W -Wall -std=c++17 $(PARALLEL) $(DEFINES)
 CXXFLAGS	= -W -Wall $(PARALLEL) $(DEFINES)
-NVCCFLAGS	= -g -G --use_fast_math
+NVCCFLAGS	= -g -G --use_fast_math -arch=sm_35
 
 LIBS		= $(PARALLEL)
 INCPATH		= /usr/include/
@@ -18,33 +18,26 @@ INCPATH		= /usr/include/
 #CFLAGS=-lGL -lglut -lpthread -llibtiff  -O3 -finline-functions -ffast-math -fomit-frame-pointer -funroll-loops
 #CXXFLAGS=-lGL -lglut -lpthread -llibtiff  -O3 -finline-functions -ffast-math -fomit-frame-pointer -funroll-loops
 
-OBJECTS = matrix_funcs.o
-TARGETS = matrix
-
 all: matrix
 
 OBJECTS 	= matrix_funcs.o
 TARGET 		= matrix 
 
 matrix: matrix.cu matrix_funcs.o matrix.h
-	$(NVCC) -o $@ matrix.cu matrix_funcs.o 
+	$(NVCC) -o $@ matrix.cu matrix_funcs.o $(NVCCFLAGS)
 
 matrix_funcs.o: matrix_funcs.cu
-	$(NVCC) -c $@ $< 
+	$(NVCC) -c $@ $< $(NVCCFLAGS)
 
 .PHONY:
-	clean test
+	clean test run
 
 clean:
 	$(DEL_FILE) $(OBJECTS) $(TARGET)
 
-test:
-	echo "/*   N=M=1000   */\n\n" > output
-	./matrix -n 1000 -m 1000 -t >> output
-	echo "/*   N=M=5000   */\n\n" >> output
-	./matrix -n 5000 -m 5000 -t >> output
-	echo "/*   N=M=10000   */\n\n" >> output
-	./matrix -n 10000 -m 10000 -t >> output
-	echo "/*   N=M=25000   */\n\n" >> output
-	./matrix -n 25000 -m 25000 -t >> output
-	 
+test: matrix
+	./test.sh
+
+run: matrix
+	./matrix -t -n 1000 -m 1000
+	
