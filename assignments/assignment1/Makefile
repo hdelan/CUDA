@@ -20,13 +20,16 @@ INCPATH		= /usr/include/
 
 all: matrix
 
-OBJECTS 	= matrix_funcs.o
+OBJECTS 	= cpu_funcs.o gpu_funcs.o 
 TARGET 		= matrix 
 
-matrix: matrix.cu matrix_funcs.o matrix.h
-	$(NVCC) -o $@ matrix.cu matrix_funcs.o $(NVCCFLAGS)
+matrix: matrix.cu $(OBJECTS) matrix.h
+	$(NVCC) -o $@ $< $(OBJECTS) $(NVCCFLAGS)
 
-matrix_funcs.o: matrix_funcs.cu
+cpu_funcs.o: cpu_funcs.cu
+	$(NVCC) -c $@ $< $(NVCCFLAGS)
+
+gpu_funcs.o: gpu_funcs.cu
 	$(NVCC) -c $@ $< $(NVCCFLAGS)
 
 .PHONY:

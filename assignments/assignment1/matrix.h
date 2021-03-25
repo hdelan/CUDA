@@ -1,6 +1,8 @@
 #ifndef MATRIX_H
 #define MATRIX_H
 
+unsigned int MAX_DIM=1000000;
+
 // KERNELS
 __global__ void sum_abs_rows_GPU(float * data, float * rowsum, const int N, const int M);
 __global__ void sum_abs_cols_GPU(float * data, float * colsum, const int N, const int M);
