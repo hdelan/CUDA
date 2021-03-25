@@ -1,3 +1,12 @@
+/**
+ * \file:        cpu_funcs.cu
+ * \brief:       CUDA Assignment 1:
+ *               Some CPU functions for summing rows, summing columns and performing vector reductions, as well as helpers.
+ * \author:      Hugh Delaney
+ * \version:     
+ * \date:        2021-03-25
+ */
+
 #include <iostream> 
 #include <iomanip> 
 #include <stdlib.h> 
@@ -9,6 +18,18 @@
 unsigned int MAX_DIM = 100000;
 
 // CPU FUNCTIONS
+
+
+/* --------------------------------------------------------------------------*/
+/**
+ * \brief:       A function to perform a vector reduction in serial on CPU
+ *
+ * \param:       vector
+ * \param:       n
+ *
+ * \returns      Sum
+ */
+/* ----------------------------------------------------------------------------*/
 double vector_reduction_CPU(const double * vector, const int n) {
   double sum = 0.0f;
   for (int i = 0; i < n; ++i) {
@@ -18,6 +39,16 @@ double vector_reduction_CPU(const double * vector, const int n) {
 }
 
 
+/* --------------------------------------------------------------------------*/
+/**
+ * \brief:       A function to compute the rowsums in serial on CPU
+ *
+ * \param:       matrix         The matrix to be rowsummed
+ * \param:       rowsum         The N-length returned rowsum -- "a column vector"
+ * \param:       N              The number of rows
+ * \param:       M              The number of columns
+ */
+/* ----------------------------------------------------------------------------*/
 void sum_abs_rows_CPU(double * matrix, double * rowsum, int N, int M) {
     // The return value will be the matrix of rowsums
     for (int i = 0; i < N; ++i) {
@@ -28,6 +59,16 @@ void sum_abs_rows_CPU(double * matrix, double * rowsum, int N, int M) {
     }
 }
 
+/* --------------------------------------------------------------------------*/
+/**
+ * \brief:       A function to compute column sums in serial on CPU
+ *
+ * \param:       matrix
+ * \param:       colsum        The M-length colsum to be returned
+ * \param:       N
+ * \param:       M
+ */
+/* ----------------------------------------------------------------------------*/
 void sum_abs_cols_CPU(double * matrix, double * colsum, int N, int M) {
     // The return value will be the matrix of rowsums
     for (int i = 0; i < M; ++i) {
@@ -39,6 +80,22 @@ void sum_abs_cols_CPU(double * matrix, double * colsum, int N, int M) {
 }
 
 // HELPER FUNCTIONS
+
+
+/* --------------------------------------------------------------------------*/
+/**
+ * \brief:       A function to parse the command line for optional parameters
+ *
+ * \param:       argc
+ * \param:       argv
+ * \param:       n
+ * \param:       m
+ * \param:       seed
+ * \param:       start_time
+ * \param:       print_time
+ * \param:       block_size
+ */
+/* ----------------------------------------------------------------------------*/
 void parse_command_line(const int argc, char ** argv, unsigned int & n, unsigned int & m, long unsigned int & seed, struct timeval & start_time, int & print_time, unsigned int & block_size) {
   int c;
   unsigned int tmp;
@@ -46,6 +103,7 @@ void parse_command_line(const int argc, char ** argv, unsigned int & n, unsigned
   // Using getopt to parse the command line with options:
   // n - dimension of n
   // m - dimension of m
+  // b - choose block size
   // r - seed RNG with time(NULL)
   // h - help
   while ((c = getopt(argc, argv, "n:m:b:rth")) != -1) {
@@ -68,6 +126,7 @@ void parse_command_line(const int argc, char ** argv, unsigned int & n, unsigned
         }
         break;
 
+      // Choose the bliocksize?
       case 'b':
 	tmp = std::stoi(optarg);
 	if ((tmp > 1) && (tmp < 1025)) {
@@ -76,6 +135,7 @@ void parse_command_line(const int argc, char ** argv, unsigned int & n, unsigned
   	  std::cout << "Invalid block size, using default " << block_size << std::endl;
 	}
 	break;
+
         // Seed the RNG with microsecond time
       case 'r':
         gettimeofday(&start_time, NULL);
@@ -99,6 +159,15 @@ void parse_command_line(const int argc, char ** argv, unsigned int & n, unsigned
   }
 }
 
+/* --------------------------------------------------------------------------*/
+/**
+ * \brief:       A function to print a matrix if it is smaller than 100 x 100
+ *
+ * \param:       A
+ * \param:       N
+ * \param:       M
+ */
+/* ----------------------------------------------------------------------------*/
 void print_matrix_CPU(double * A, const unsigned int N, const unsigned int M) {
 	if (N > 100 || M > 100) {
 		return;

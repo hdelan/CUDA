@@ -1,3 +1,10 @@
+/**
+ * \file:        matrix.cu
+ * \brief:       The main function for assignment 1
+ * \author:      Hugh Delaney
+ * \version:     
+ * \date:        2021-03-25
+ */
 #include <iostream> 
 #include <iomanip> 
 #include <stdlib.h> 
@@ -8,6 +15,8 @@
 
 int main(int argc, char * argv[]) {
 
+  /*                     INITIALIZING                       */
+  
   // Default values for N, M, block_size
   unsigned int N {10}, M {10};
   unsigned int block_size = 32;
@@ -21,7 +30,7 @@ int main(int argc, char * argv[]) {
   // Default seed
   long unsigned int seed {1234};
   
-  // Get optional parameters
+  /*              GET OPTIONAL PARAMETERS                 */
   parse_command_line(argc, argv, N, M, seed, start_time, print_time, block_size);
   
   // Seed RNG
@@ -32,13 +41,17 @@ int main(int argc, char * argv[]) {
   for (unsigned int i = 0; i < N*M; i++)
     A[i] = (double) drand48()*20.0 - 10.0;  
 
+  double * rowsum {(double *) malloc(sizeof(double) * N)};
+  double * colsum {(double *) malloc(sizeof(double) * M)};
+
+  /*                     CPU STUFF                       */
+  
+  // Print options
   /*std::cout << std::setw(64) << std::setfill('~') << '\n';
   std::cout << "\t\t\tCPU\n";
   std::cout << std::setw(64) << std::setfill('~') << '\n' << std::setfill(' ');
   print_matrix_CPU(A, N, M);
 */
-  double * rowsum {(double *) malloc(sizeof(double) * N)};
-  double * colsum {(double *) malloc(sizeof(double) * M)};
 
   /* CPU ROWSUM */ 
   gettimeofday(&cpu_time_rowsum, NULL);
@@ -63,21 +76,22 @@ int main(int argc, char * argv[]) {
   //print_matrix_CPU(colsum, 1, M);
 
   //std::cout << "Sum of rowsums: " << std::setprecision(20) << sum_of_rowsums_CPU << std::endl;
-  //std::cout << "Sum of colsums: " << sum_of_colsums_CPU << std::endl;
+  //std::cout << "Sum of colsums: " << sum_of_colsums_CPU << '\n' << std::endl;
   
-  std::cout << '\n';
-
   /* Calculating CPU times */
   double rowsum_time_CPU = ((double) cpu_time_rowsum1.tv_sec - cpu_time_rowsum.tv_sec) + (((double)(cpu_time_rowsum1.tv_usec - cpu_time_rowsum.tv_usec))/1000000.0);
   double colsum_time_CPU = ((double) cpu_time_colsum1.tv_sec - cpu_time_colsum.tv_sec) + (((double)(cpu_time_colsum1.tv_usec - cpu_time_colsum.tv_usec))/1000000.0);
   double reduction_time_CPU = ((double) cpu_time_reduction1.tv_sec - cpu_time_reduction.tv_sec) + (((double)(cpu_time_reduction1.tv_usec - cpu_time_reduction.tv_usec))/1000000.0);
 
 
-  // GPU STUFF
+  /*                     GPU STUFF                       */
+
   //std::cout << std::setw(64) << std::setfill('~') << '\n';
   //std::cout << "\t\t\tGPU\n";
   //std::cout << std::setw(64) << std::setfill('~') << '\n' << std::setfill(' ');
 
+  
+  /*                     INITIALIZING                       */
   double * A_d, * rowsum_d, * colsum_d;
 
   cudaMalloc((void **) &A_d, sizeof(double)*N*M);
@@ -86,6 +100,7 @@ int main(int argc, char * argv[]) {
 
   cudaMemcpy(A_d, A, sizeof(double)*N*M, cudaMemcpyHostToDevice);
 
+  // Initialize block_size
   dim3 dimBlock {block_size};
 
 
@@ -124,6 +139,7 @@ int main(int argc, char * argv[]) {
   double colsum_time_GPU = ((double) gpu_time_colsum1.tv_sec - gpu_time_colsum.tv_sec) + (((double)(gpu_time_colsum1.tv_usec - gpu_time_colsum.tv_usec))/1000000.0);
   double reduction_time_GPU = ((double) gpu_time_reduction1.tv_sec - gpu_time_reduction.tv_sec) + (((double)(gpu_time_reduction1.tv_usec - gpu_time_reduction.tv_usec))/1000000.0);
   
+  /* PRINT OUTPUT */
   if (print_time == 1) {
   
 	std::cout << std::setw(64) << std::setfill('~') << '\n';
