@@ -1,0 +1,134 @@
+\documentclass[a4paper, fleqn]{article}
+
+\date{\today}
+\author{Hugh Delaney}
+\title{CUDA \\ Assignment 1}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{textcomp}
+\usepackage{amsmath, amssymb, amsthm}
+\usepackage{mathtools, geometry}
+\geometry{left=2.5cm,right=2.5cm,top=2.5cm,bottom=2.5cm}
+\usepackage{xcolor}
+\usepackage{listings}
+
+\DeclarePairedDelimiterX{\inp}[2]{\langle}{\rangle}{#1, #2}
+
+\setlength{\mathindent}{1cm}
+
+% figure support
+\usepackage{import}
+\usepackage{xifthen}
+\pdfminorversion=7
+\usepackage{subfigure, pdfpages}
+\usepackage{transparent}
+\newcommand{\incfig}[1]{%
+        \def\svgwidth{\columnwidth}
+        \import{./figures/}{#1.pdf_tex}
+}
+
+\definecolor{codegreen}{rgb}{0,0.6,0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.92}
+
+\lstdefinestyle{mystyle}{
+    backgroundcolor=\color{backcolour},   
+    commentstyle=\color{codegreen},
+    keywordstyle=\color{magenta},
+    numberstyle=\tiny\color{codegray},
+    stringstyle=\color{codepurple},
+    basicstyle=\ttfamily\footnotesize,
+    breakatwhitespace=false,         
+    breaklines=true,                 
+    captionpos=b,                    
+    keepspaces=true,                 
+    numbers=left,                    
+    numbersep=5pt,                  
+    showspaces=false,                
+    showstringspaces=false,
+    showtabs=false,                  
+    tabsize=2
+}
+
+\lstset{style=mystyle}
+
+
+
+\pdfsuppresswarningpagegroup=1
+
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{corollary}{Corollary}[theorem]
+\newtheorem{proposition}{Proposition}[theorem]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{remark}{Lemma}[theorem]
+
+\renewcommand\qedsymbol{$\blacksquare$}
+
+\begin{document}
+\maketitle
+        \section{CPU Calculation}%
+        Please see \texttt{cpu\_funcs.cu} for implementation. \texttt{./matrix} accepts parameters:
+        \begin{itemize}
+                \item \texttt{-n [num\_rows]} specify number of rows
+                \item \texttt{-m [num\_cols]} specify number of cols
+                \item \texttt{-b [block\_size]} specify block size.
+                \item \texttt{-t} display the time?
+                \item \texttt{-r} seed with random value?
+        \end{itemize}
+        \section{Parallel Implementation}%
+        Please see \texttt{gpu\_funcs.cu} for kernels. Use \texttt{-t} when running \texttt{./matrix} to display the CPU vs GPU times and speedups. 
+
+        \texttt{vector\_reduction\_GPU} contains two internal kernel calls to \texttt{reduce0\_GPU} and \texttt{reduce1\_GPU}.  
+        \section{Performance Improvement}%
+\begin{center}{Rowsum speedup vs CPU \\}
+ \begin{tabular}{||c | c | c | c | c ||}
+ \hline
+ Block size & n,m = 1000 & n,m = 5000 & n,m = 10000 & n,m = 25000 \\ [0.5ex] 
+ \hline
+ 4 & 291 & 4826 & 20144 & 120456 \\
+ \hline
+ 8 & 291 & 4826 & 20144 & 120456 \\
+ \hline
+ 8 & 291 & 4826 & 20144 & 120456 \\
+ \hline
+ 8 & 291 & 4826 & 20144 & 120456 \\
+ \hline
+ 8 & 291 & 4826 & 20144 & 120456 \\
+ \hline
+ 8 & 291 & 4826 & 20144 & 120456 \\
+ \hline
+ 8 & 291 & 4826 & 20144 & 120456 \\
+ \hline
+
+ \hline
+\end{tabular}
+\end{center}
+        
+\begin{center}{Colsum speedup vs CPU \\}
+ \begin{tabular}{||c | c | c | c | c ||}
+ \hline
+ Block size & n,m = 1000 & n,m = 5000 & n,m = 10000 & n,m = 25000 \\ [0.5ex] 
+ \hline
+ 4 & 1653 & 51842 & 279702 & 3697568 \\
+ \hline
+ 8 & 291 & 4826 & 20144 & 120456 \\
+ \hline
+ 8 & 291 & 4826 & 20144 & 120456 \\
+ \hline
+ 8 & 291 & 4826 & 20144 & 120456 \\
+ \hline
+ 8 & 291 & 4826 & 20144 & 120456 \\
+ \hline
+ 8 & 291 & 4826 & 20144 & 120456 \\
+ \hline
+ 8 & 291 & 4826 & 20144 & 120456 \\
+ \hline
+
+ \hline
+\end{tabular}
+        
+        
+\end{document}
