@@ -28,17 +28,17 @@ int main(int argc, char * argv[]) {
   srand48(seed);
   
   // Populate matrix with values from [-10.0, 10.0]
-  float * A {(float *) malloc(sizeof(float) * N * M)};
+  double * A {(double *) malloc(sizeof(double) * N * M)};
   for (unsigned int i = 0; i < N*M; i++)
-    A[i] = (float) drand48()*20.0 - 10.0;  
+    A[i] = (double) drand48()*20.0 - 10.0;  
 
   /*std::cout << std::setw(64) << std::setfill('~') << '\n';
   std::cout << "\t\t\tCPU\n";
   std::cout << std::setw(64) << std::setfill('~') << '\n' << std::setfill(' ');
   print_matrix_CPU(A, N, M);
 */
-  float * rowsum {(float *) malloc(sizeof(float) * N)};
-  float * colsum {(float *) malloc(sizeof(float) * M)};
+  double * rowsum {(double *) malloc(sizeof(double) * N)};
+  double * colsum {(double *) malloc(sizeof(double) * M)};
 
   /* CPU ROWSUM */ 
   gettimeofday(&cpu_time_rowsum, NULL);
@@ -52,8 +52,8 @@ int main(int argc, char * argv[]) {
 
   /* CPU REDUCTION */ 
   gettimeofday(&cpu_time_reduction, NULL);
-  float sum_of_rowsums_CPU = vector_reduction_CPU(rowsum, N);
-  float sum_of_colsums_CPU = vector_reduction_CPU(colsum, M);
+  double sum_of_rowsums_CPU = vector_reduction_CPU(rowsum, N);
+  double sum_of_colsums_CPU = vector_reduction_CPU(colsum, M);
   gettimeofday(&cpu_time_reduction1, NULL);
   
   // Option to print rowsums & colsums
@@ -78,13 +78,13 @@ int main(int argc, char * argv[]) {
   //std::cout << "\t\t\tGPU\n";
   //std::cout << std::setw(64) << std::setfill('~') << '\n' << std::setfill(' ');
 
-  float * A_d, * rowsum_d, * colsum_d;
+  double * A_d, * rowsum_d, * colsum_d;
 
-  cudaMalloc((void **) &A_d, sizeof(float)*N*M);
-  cudaMalloc((void **) &rowsum_d, sizeof(float)*N);
-  cudaMalloc((void **) &colsum_d, sizeof(float)*M);
+  cudaMalloc((void **) &A_d, sizeof(double)*N*M);
+  cudaMalloc((void **) &rowsum_d, sizeof(double)*N);
+  cudaMalloc((void **) &colsum_d, sizeof(double)*M);
 
-  cudaMemcpy(A_d, A, sizeof(float)*N*M, cudaMemcpyHostToDevice);
+  cudaMemcpy(A_d, A, sizeof(double)*N*M, cudaMemcpyHostToDevice);
 
   dim3 dimBlock {block_size};
 
@@ -103,15 +103,15 @@ int main(int argc, char * argv[]) {
   
   /* GPU REDUCTIONS */
   gettimeofday(&gpu_time_reduction, NULL);
-  float sum_of_rowsums_GPU = vector_reduction_GPU(rowsum_d, N, dimBlock, dimGrid_col);
-  float sum_of_colsums_GPU = vector_reduction_GPU(colsum_d, M, dimBlock, dimGrid_row);
+  double sum_of_rowsums_GPU = vector_reduction_GPU(rowsum_d, N, dimBlock, dimGrid_col);
+  double sum_of_colsums_GPU = vector_reduction_GPU(colsum_d, M, dimBlock, dimGrid_row);
   gettimeofday(&gpu_time_reduction1, NULL);
   
   /* Option to print rowsums, colsums if N <= 100 or M <= 100 */
-  //cudaMemcpy(rowsum, rowsum_d, sizeof(float)*N, cudaMemcpyDeviceToHost);
+  //cudaMemcpy(rowsum, rowsum_d, sizeof(double)*N, cudaMemcpyDeviceToHost);
   //std::cout << "Rowsums: \n";
   //print_matrix_CPU(rowsum, N, 1);
-  //cudaMemcpy(colsum, colsum_d, sizeof(float)*M, cudaMemcpyDeviceToHost);
+  //cudaMemcpy(colsum, colsum_d, sizeof(double)*M, cudaMemcpyDeviceToHost);
   //std::cout << "Column sums: \n";
   //print_matrix_CPU(colsum, 1, M);
   
