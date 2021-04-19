@@ -10,7 +10,7 @@ DEL_FILE= 	rm -f
 #DEFINES		= -DWITH_OPENMP
 CFLAGS		= -W -Wall -std=c++17 $(PARALLEL) $(DEFINES)
 CXXFLAGS	= -W -Wall $(PARALLEL) $(DEFINES)
-NVCCFLAGS	= -g -G --use_fast_math -arch=sm_35 -Wno-deprecated-gpu-targets
+NVCCFLAGS	= --use_fast_math -arch=sm_35 -Wno-deprecated-gpu-targets
 
 LIBS		= $(PARALLEL)
 INCPATH		= /usr/include/
@@ -42,5 +42,5 @@ test: matrix
 	./test.sh
 
 run: matrix
-	./matrix -t -n 1000 -m 1000
+	./matrix -t -n 10000 -m 10000
 	

@@ -54,7 +54,7 @@ void sum_abs_rows_CPU(float * matrix, float * rowsum, int N, int M) {
     for (int i = 0; i < N; ++i) {
         rowsum[i] = 0.0f;
         for (int j = 0; j < M; ++j) {
-            rowsum[i] += std::abs(matrix[i*M + j]);
+            rowsum[i] += std::fabs(matrix[i*M + j]);
         }
     }
 }
@@ -74,7 +74,7 @@ void sum_abs_cols_CPU(float * matrix, float * colsum, int N, int M) {
     for (int i = 0; i < M; ++i) {
         colsum[i] = 0.0f;
         for (int j = 0; j < N; ++j) {
-            colsum[i] += std::abs(matrix[j*M + i]);
+            colsum[i] += std::fabs(matrix[j*M + i]);
         }
     }
 }
@@ -126,7 +126,7 @@ void parse_command_line(const int argc, char ** argv, unsigned int & n, unsigned
         }
         break;
 
-      // Choose the bliocksize?
+      // Choose the blocksize?
       case 'b':
 	tmp = std::stoi(optarg);
 	if ((tmp > 1) && (tmp < 1025)) {
@@ -169,9 +169,9 @@ void parse_command_line(const int argc, char ** argv, unsigned int & n, unsigned
  */
 /* ----------------------------------------------------------------------------*/
 void print_matrix_CPU(float * A, const unsigned int N, const unsigned int M) {
-	if (N > 100 || M > 100) {
-		return;
-	}	
+	//if (N > 100 || M > 100) {
+	//	return;
+	//}	
 
 	for (int i = 0; i < N; i++) {
 		std::cout << " | ";

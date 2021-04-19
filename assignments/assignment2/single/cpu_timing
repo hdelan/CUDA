@@ -1,0 +1,20 @@
+nvcc -o radiator main.cu cpu_funcs.o gpu_funcs.o  --use_fast_math -arch=sm_35 -Wno-deprecated-gpu-targets
+nvprof ./radiator -n 15360 -m 15360
+n: 15360
+m: 15360
+max iters: 1000
+print_time: 0
+block_size: 8
+Threads per block: 8
+Num blocks: 1920
+CPU Sweep 1 time 862.486517
+Max diff: 1.54972e-05 at index (14247, 672)
+A[i]: 0.722791
+B[i]: 0.722775
+
+
+CPU Matrix
+
+
+GPU Matrix
+Averages: 

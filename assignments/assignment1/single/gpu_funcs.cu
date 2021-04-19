@@ -30,10 +30,11 @@
 __global__ void sum_abs_rows_GPU(float * matrix_GPU, float * rowsum_GPU, const int N, const int M) {
         int idx = blockIdx.x*blockDim.x + threadIdx.x;
         if (idx < N) {
-        	rowsum_GPU[idx] = 0.0f;
+		float sum = 0.0f;
                 for (int j = 0; j < M; ++j) {
-                        rowsum_GPU[idx] += std::abs(matrix_GPU[idx*M + j]);
+                        sum += std::fabs(matrix_GPU[idx*M + j]);
                 }
+		rowsum_GPU[idx] = sum;
         }
 }
 
@@ -52,11 +53,13 @@ __global__ void sum_abs_rows_GPU(float * matrix_GPU, float * rowsum_GPU, const i
 __global__ void sum_abs_cols_GPU(float * matrix_GPU, float * colsum_GPU, const int N, const int M) {
         int idx = blockIdx.x*blockDim.x + threadIdx.x;
         if (idx < M) {
-        	colsum_GPU[idx] = 0.0f;
+		float sum = 0.0f;
                 for (int j = 0; j < N; ++j) {
-                        colsum_GPU[idx] += std::abs(matrix_GPU[j*M + idx]);
+                        sum += std::fabs(matrix_GPU[j*M + idx]);
                 }
+		colsum_GPU[idx] = sum;
         }
+	__syncthreads();
 }
 
 /* --------------------------------------------------------------------------*/
