@@ -21,7 +21,7 @@ void parse_command_line(const int argc, char ** argv, unsigned int & n, unsigned
 void print_matrix_CPU(float * A, const unsigned int N, const unsigned int M);
 
 int main(int argc, char * argv[]) { 
-  unsigned int n {6400}, m {6400}, block_size {8}, max_iters {1000};
+  unsigned int n {6400}, m {6400}, block_size {8}, max_iters {100};
   long unsigned int seed {123};
   int print_time {0}, cpu_calc {1};
   struct timeval t1, t2; //t3;

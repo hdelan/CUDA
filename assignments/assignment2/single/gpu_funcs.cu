@@ -150,10 +150,50 @@ __global__ void gpu_rad_sweep4(float * a_d, unsigned int n, unsigned int m, unsi
   for (int i=0;i<dim_per_thread;i++)
     b_d[blockIdx.x*m + tidx*dim_per_thread + i] = b_local[i];
 }
-/*
 __global__ void gpu_rad_sweep5(float * a_d, unsigned int n, unsigned int m, unsigned int iters, float * b_d) {
-  __shared__ float a_d[];
+  __shared__ float a_shared[];
+
+  int a_dim = 49152/sizeof(float);
+
+  float save[2];
+  float first_four[4];
+  int save_index = 0;
+
+  int tidx = threadIdx.x;
+  int global_arr_index = tidx;
+  int shared_index = tidx;
+  int step = blockDim.x;
+  int runs_per_iter = n/a_dim + ((2*(n-1)/a_dim+n)%a_dim > 0) ? (1:0);
+
+  for (int i=0;i<iters;i++) {
+    for (int j=0;j<runs_per_iter;j++) {
+      if (j==runs_per_iter-1) a_dim = 2*(n-1)
+
+    // Loading array from global memory
+    while (global_arr_index < a_dim ) {
+      a_shared[shared_index] = b_d[blockIdx.x*m+global_arr_index];
+      shared_index += step;
+      global_arr_index += step;
+    }
+
+    shared_index = tidx+2;
+
+  while (shared_index < a_dim - 2)
+    save[save_index] = (1.70f*a_shared[shared_index-2] + 1.40f*a_shared[shared_index-1] + a_shared[shared_index] + 0.60f*a_shared[shared_index+1] + 0.30f*a_shared[shared_index+2])/5.0f;
+    __syncthreads();
+    if ((shared_index-2)/step >= 1) a_shared[shared_index-step] = save[1-save_index];
+    shared_index += step;
+    save_index = 1-save_index;
+
+    
+
+      
+
+
+
+      
   
-  for (int)
   
-*/
+
+    shared_index = tidx;
+  

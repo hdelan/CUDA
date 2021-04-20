@@ -12,7 +12,7 @@ OPT = -O3
 #DEFINES		= -DWITH_OPENMP
 CFLAGS		= -W -Wall -std=c++17 $(PARALLEL) $(DEFINES)
 CXXFLAGS	= -W -Wall $(PARALLEL) $(DEFINES) $(OPT)
-NVCCFLAGS	= --use_fast_math -arch=sm_35 -Wno-deprecated-gpu-targets --ptxas-options=-v
+NVCCFLAGS	= --use_fast_math -arch=sm_35 -Wno-deprecated-gpu-targets -lineinfo #--ptxas-options=-v
 
 LIBS		= $(PARALLEL)
 INCPATH		= /usr/include/
