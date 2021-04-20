@@ -115,8 +115,9 @@ The code for questions 1-3 can be found in the directory \texttt{single}, wherea
 \end{center}
 We are clearly getting a massive speedup over the CPU when doing this kind of operation. The CPU is already quite good at doing rowsums in C due to contiguous data access (since C is row-major), however the incredible parallelism given by CUDA cannot be beaten. As is to be expected, the speedup increases as $m,n \to 25000$, since the proportion of time that data is being transmitted becomes a smaller fraction of the entire operation.
 
+It is also worth noting that the GPU time (see \texttt{output/*.txt}) is almost identical for each operation regardless of the matrix dimension. This goes to show that most of the work is merely going to and from the GPU in the first place. 
+
 It seems that anything from 16-256 could be chosen as optimal block size. There is some random variation in performance at times (perhaps due to other jobs on the machine) so I think any of these values could be called optimal. They're all pretty good!
-\pagebreak
 
 \subsection{Column Sum Speedup vs CPU}%
 \begin{center}
@@ -174,26 +175,55 @@ There seems to be more spread in terms of which block sizes perform well. The sm
  \hline
 \end{tabular}
 \end{center}
-Reduction doesn't work well with CUDA! This is due to the fact that we need to combine all data into a single place, which is not easily achieved in CUDA, due to its low arithmetic intensity and also since it requires some global syncs (which I achieved using multiple kernel invocations). If we were able to use the shared memory then maybe the performance would be somewhat improved, but as it stands this is not a task that suits CUDA. 
+Reduction doesn't work well with CUDA! This is due to the fact that we need to combine all data into a single place, which is not easily achieved in CUDA, due to its low arithmetic intensity and also since it requires some global syncs (which I achieved using multiple kernel invocations). If we were able to use the shared memory then maybe the performance would be somewhat improved, but as it stands this is not a task that suits CUDA.
 
 If we were to get an efficient algorithm working using the shared memory and some other fancy optimisation tricks (as discussed in Mark Harris's CUDA reduction walkthrough---which incidentally only ever compares CUDA reductions to other CUDA reductions, not to CPU reduction speeds), then maybe we would be able to beat CPU reduction speeds. But at this point it must be asked: is it worthwhile to spend lots of time sweating over a fiddly algorithm that might only barely beat a CPU performance-wise? The answer is almost always \emph{no}. The best approach for an assignment like this would be to do the matrix operations on the GPU and then offload the reductions to the CPU. Hybrid solutions are always best.
 
 \section{Double Precision Testing}%
 
-Using blocksize 128 we can compare the performance between single and double precision. Please see \texttt{double/output/} for data. 
+Using blocksize 128 we can compare the performance between single and double precision. Please see \texttt{double/output/} for data. Run \texttt{make test} when in \texttt{double} to generate values into \texttt{double/output/}.  
 
-
+\subsection{Matrix Rowsum Speedup \texttt{float} vs \texttt{double}  }%
 \begin{center}
  \begin{tabular}{||c | c | c | c | c ||}
  \hline
  Precision & n,m = 1000 & n,m = 5000 & n,m = 10000 & n,m = 25000 \\ [0.5ex] 
  \hline
- Single Precision & 0.002 & 0.002 & 0.001 & 0.001 \\
+ Single & 291 & 973 & 2023 & 5061 \\
  \hline
- Double Precision & 0.002 & 0.002 & 0.002 & 0.001 \\
+ Double & 224 & 1022 & 2044 & 4909 \\
  \hline
  \hline
 \end{tabular}
 \end{center}
 
+\subsection{Matrix Colsum Speedup \texttt{float} vs \texttt{double}  }%
+\begin{center}
+ \begin{tabular}{||c | c | c | c | c ||}
+ \hline
+ Precision & n,m = 1000 & n,m = 5000 & n,m = 10000 & n,m = 25000 \\ [0.5ex] 
+ \hline
+ Single & 1652 & 11825 & 24696 & 65435 \\
+ \hline
+ Double & 2158 & 13148 & 21866 & 74403 \\
+ \hline
+ \hline
+\end{tabular}
+\end{center}
+
+\subsection{Colsum Errors \texttt{float} vs \texttt{double}  }%
+\begin{center}
+ \begin{tabular}{||c | c | c | c | c ||}
+ \hline
+ Precision & n,m = 1000 & n,m = 5000 & n,m = 10000 & n,m = 25000 \\ [0.5ex] 
+ \hline
+ Single & $7\times10^{-7}$ & $1\times10^{-6}$& $8\times10^{-7}$& $8\times10^{-7}$\\
+ \hline
+ Double & $1\times10^{-15}$ & $1\times10^{-15}$& $5\times10^{-16}$& $5\times10^{-16}$\\
+ \hline
+ \hline
+\end{tabular}
+\end{center}
+
+We can see that our code performs just as well if not \emph{better} than our single precision code. This is most unexpected. So why do we use \texttt{float}s instead of \texttt{double}s, in general? Presumably this is because on most GPUs we will be limited in our calculations by the amount of memory we can have on the GPU at any particular time. Using \texttt{float}s allows us to work on twice as many values than if we are using \texttt{double}s, so the data throughput can be greater, if we are indeed limited by memory capacity. For this problem, however, where we are not limited by the GPU's memory, it may be preferable to use \texttt{double}s. This is because we get the exact same performance, and our error gets better by 8-10 orders of magnitude.
 \end{document}
