@@ -47,4 +47,4 @@ run: radiator
 	./radiator -n 10 -m 10
 
 prof: radiator
-	nvprof ./radiator -c -n 15360 -m 15360
+	nvprof ./radiator -c -n 15360 -m 6400 -p 100

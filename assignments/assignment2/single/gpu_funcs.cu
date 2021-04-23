@@ -4,7 +4,8 @@
 #include <unistd.h> 
 #include <sys/time.h> 
 
-#define BLOCK_SIZE 8
+#define BLOCK_SIZE 32
+#define SHARED_DIM 12288
 
 // KERNELS
 
@@ -150,50 +151,141 @@ __global__ void gpu_rad_sweep4(float * a_d, unsigned int n, unsigned int m, unsi
   for (int i=0;i<dim_per_thread;i++)
     b_d[blockIdx.x*m + tidx*dim_per_thread + i] = b_local[i];
 }
+
 __global__ void gpu_rad_sweep5(float * a_d, unsigned int n, unsigned int m, unsigned int iters, float * b_d) {
-  __shared__ float a_shared[];
-
-  int a_dim = 49152/sizeof(float);
-
-  float save[2];
-  float first_four[4];
-  int save_index = 0;
-
+  __shared__ float a_shared[SHARED_DIM];
   int tidx = threadIdx.x;
-  int global_arr_index = tidx;
-  int shared_index = tidx;
   int step = blockDim.x;
-  int runs_per_iter = n/a_dim + ((2*(n-1)/a_dim+n)%a_dim > 0) ? (1:0);
 
-  for (int i=0;i<iters;i++) {
-    for (int j=0;j<runs_per_iter;j++) {
-      if (j==runs_per_iter-1) a_dim = 2*(n-1)
+  // These values will be used so we only need one array to do our calculations, instead
+  // of two
+  float f0, f1;
+  float g0 = -1.0, g1 = -1.0, tmp;
 
-    // Loading array from global memory
-    while (global_arr_index < a_dim ) {
-      a_shared[shared_index] = b_d[blockIdx.x*m+global_arr_index];
-      shared_index += step;
-      global_arr_index += step;
+  int remaining;
+  int glob_index, shared_index, glob_start;
+
+  for (unsigned int i=0;i<iters;i++) {
+
+    glob_start = m*blockIdx.x+2;;
+    remaining = m-2;
+    f0 = (blockIdx.x+1)/ (float)n;
+    f1 = 0.80f*(blockIdx.x+1)/ (float)n;
+    
+    glob_index = glob_start + tidx;
+
+    //              BEGIN LOOP          //
+    //  if entire row will not fit in SHARED_DIM     
+    while (remaining > SHARED_DIM) {
+      // These values will be cached from previous cycle or will hold boundary conditions
+      a_shared[0] = f0;
+      a_shared[1] = f1;
+
+      shared_index = tidx+2;
+      glob_index = glob_start+tidx;
+
+      // Load section of array into shared memory
+      while (shared_index < SHARED_DIM) {
+        a_shared[shared_index] = a_d[glob_index];
+        shared_index += step;
+        glob_index += step;
+      }
+
+      __syncthreads();
+
+      shared_index = tidx+2;
+
+      // Perform calculation from shared[2] to shared[SHARED_DIM-3]
+      while (shared_index < SHARED_DIM-2) {
+        g0 = (1.70f*a_shared[shared_index-2] + 1.40f*a_shared[shared_index-1] + a_shared[shared_index] + 0.60f*a_shared[shared_index+1] + 0.30f*a_shared[shared_index+2])/5.0f;
+        // TODO come up with a smart way of syncing threads
+        //__syncthreads();
+        if (g1 >= 0.0f) a_shared[shared_index-step] = g1;
+        // Swap g0 and g1 so that the just computed value will be stored in the next cycle
+        tmp = g0;
+        g0 = g1;
+        g1 = tmp;
+        shared_index +=step;
+      }
+      __syncthreads();
+      // Cache 4th and 3rd last values of prev array to store in first two vals of next array
+      f0 = a_shared[SHARED_DIM-4];
+      f1 = a_shared[SHARED_DIM-3];
+
+      // Store final vals in shared array
+      if (shared_index-step < SHARED_DIM) a_shared[shared_index-step] = g1;
+      __syncthreads();
+      
+      // Reset g0, g1 so not used on first iteration of next run
+      g1 = -1.0f, g0 = -1.0f;
+
+      shared_index = tidx+2;
+      glob_index = glob_start+tidx;
+      // Write shared array to global
+      while (shared_index < SHARED_DIM-2) {
+        a_d[glob_index] = a_shared[shared_index];
+        shared_index += step;
+        glob_index += step;
+      }
+      __syncthreads();
+
+      // Decrement the global index so last two values of prev array are reloaded for simplicity
+      remaining -= SHARED_DIM - 4;
+      glob_start += SHARED_DIM - 4;
     }
+    //            END LOOP             //
+    // The rest of array is now smaller than shared dim
+    // These values will be cached from previous cycle or will hold boundary conditions
+    a_shared[0] = f0;
+    a_shared[1] = f1;
+    __syncthreads();
 
     shared_index = tidx+2;
 
-  while (shared_index < a_dim - 2)
-    save[save_index] = (1.70f*a_shared[shared_index-2] + 1.40f*a_shared[shared_index-1] + a_shared[shared_index] + 0.60f*a_shared[shared_index+1] + 0.30f*a_shared[shared_index+2])/5.0f;
+    // Load section of array into shared memory
+    while (glob_index < (blockIdx.x+1)*m) {
+      a_shared[shared_index] = a_d[glob_index];
+      shared_index += step;
+      glob_index += step;
+    }
+
+    // Setting endpoints to be a_d[0], a_d[1]
+    a_shared[remaining+2]  = (blockIdx.x+1)/ (float)n;
+    a_shared[remaining+3] = 0.80f*(blockIdx.x+1)/ (float)n;
+
     __syncthreads();
-    if ((shared_index-2)/step >= 1) a_shared[shared_index-step] = save[1-save_index];
-    shared_index += step;
-    save_index = 1-save_index;
 
-    
+    shared_index = tidx+2;
+    // Perform calculation from shared[2] to shared[SHARED_DIM-3]
+    while (shared_index < remaining+2) {
+      g0 = (1.70f*a_shared[shared_index-2] + 1.40f*a_shared[shared_index-1] + a_shared[shared_index] + 0.60f*a_shared[shared_index+1] + 0.30f*a_shared[shared_index+2])/5.0f;
+      //__syncthreads();
+      if (g1 >= 0.0f) a_shared[shared_index-step] = g1;
+      // Swap g0 and g1 so that the just computed value will be stored in the next cycle
+      tmp = g0;
+      g0 = g1;
+      g1 = tmp;
+      shared_index +=step;
+    }
 
-      
+    __syncthreads();
+    // Store final vals in shared array
+    if (g1 >= 0.0f) a_shared[shared_index-step] = g1;
+    __syncthreads();
+    // Reset g1 so not used on first iteration of next run
+    g1 = -1.0f;
+
+    shared_index = tidx+2;
+    glob_index = glob_start + tidx;
+
+    // Write shared array to global
+    while (glob_index < (blockIdx.x+1)*m) {
+      a_d[glob_index] = a_shared[shared_index];
+      shared_index += step;
+      glob_index += step;
+    }
+    __syncthreads();
+  }
+}
 
 
-
-      
-  
-  
-
-    shared_index = tidx;
-  

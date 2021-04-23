@@ -8,6 +8,7 @@ __global__ void gpu_rad_sweep1(float*, unsigned int, unsigned int, unsigned int,
 __global__ void gpu_rad_sweep2(float*, unsigned int, unsigned int, unsigned int, float*);
 __global__ void gpu_rad_sweep3(float*, unsigned int, unsigned int, unsigned int, float*);
 __global__ void gpu_rad_sweep4(float*, unsigned int, unsigned int, unsigned int, float*);
+__global__ void gpu_rad_sweep5(float*, unsigned int, unsigned int, unsigned int, float*);
 
 template <typename T>
 void cpu_rad_sweep1(T*, unsigned int, unsigned int, unsigned int, T*);
@@ -21,7 +22,7 @@ void parse_command_line(const int argc, char ** argv, unsigned int & n, unsigned
 void print_matrix_CPU(float * A, const unsigned int N, const unsigned int M);
 
 int main(int argc, char * argv[]) { 
-  unsigned int n {6400}, m {6400}, block_size {8}, max_iters {100};
+  unsigned int n {6400}, m {6400}, block_size {32}, max_iters {100};
   long unsigned int seed {123};
   int print_time {0}, cpu_calc {1};
   struct timeval t1, t2; //t3;
@@ -38,8 +39,8 @@ int main(int argc, char * argv[]) {
 
   // Set boundary conditions
   for (auto i=0;i<n;++i) {
-    A[i*n] = B[i*n] = 1.0f*(float)(i+1)/(float)n;
-    A[i*n+1] = B[i*n+1] = 0.80f*(float)(i+1)/(float)n;
+    A[i*m] = B[i*m] = 1.0f*(float)(i+1)/(float)n;
+    A[i*m+1] = B[i*m+1] = 0.80f*(float)(i+1)/(float)n;
   }
 
   float *A_d, *B_d, *avg_d;
@@ -68,7 +69,7 @@ int main(int argc, char * argv[]) {
     printf("CPU Sweep 1 time %lf\n", (double)(t2.tv_sec-t1.tv_sec)+((double)(t2.tv_usec - t1.tv_usec)/1000000.0));
     //printf("CPU Sweep 2 time %lf\n", (double)(t3.tv_sec-t2.tv_sec)+((double)(t3.tv_usec - t2.tv_usec)/1000000.0));
   } else {
-    // Use gpu_rad_sweep1 as reference for accuracy?
+    // Use gpu_rad_sweep2 as reference for accuracy?
     gpu_rad_sweep2<<<blocks, threads>>>(A_d, n, m, max_iters, B_d);
     // Move data to matrix B
     cudaMemcpy(B, A_d, sizeof(float)*n*m, cudaMemcpyDeviceToHost);
@@ -83,8 +84,8 @@ int main(int argc, char * argv[]) {
   //gpu_rad_sweep2<<<blocks, threads>>>(A_d, n, m, max_iters, B_d);
   //gpu_rad_sweep3<<<blocks, threads, 5*threads.x*sizeof(float)>>>(A_d, n, m, max_iters, B_d);
   dim3 n_blocks {n};
-  gpu_rad_sweep4<<<n_blocks, threads>>>(A_d, n, m, max_iters, B_d);
-  cudaMemcpy(A, B_d, sizeof(float)*n*m, cudaMemcpyDeviceToHost);
+  gpu_rad_sweep5<<<n_blocks, threads>>>(A_d, n, m, max_iters, B_d);
+  cudaMemcpy(A, A_d, sizeof(float)*n*m, cudaMemcpyDeviceToHost);
 
   diff_matrices(A, B, n, m);
 
