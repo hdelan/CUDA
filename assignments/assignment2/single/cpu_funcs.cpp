@@ -8,6 +8,7 @@
  */
 
 #include <iostream> 
+#include <fstream> 
 #include <iomanip> 
 #include <stdlib.h> 
 #include <unistd.h> 
@@ -26,6 +27,7 @@ void cpu_rad_sweep1(T * a, unsigned int n, unsigned int m, unsigned int iters, T
       for (auto k=2u;k<m-2;k++) {
         b[j*m+k] = (1.70f*a[j*m+k-2] + 1.40f*a[j*m+k-1] + a[j*m+k] + 0.60f*a[j*m+k+1] + 0.30*a[j*m+k+2])/5.0f;
       }
+      // Getting the end terms
       b[j*m+m-2] = (1.70f*a[j*m+m-4] + 1.40f*a[j*m+m-3] + a[j*m+m-2] + 0.60f*a[j*m+m-1]+0.30f*a[j*m])/5.0f;
       b[j*m+m-1] = (1.70f*a[j*m+m-3] + 1.40f*a[j*m+m-2] + a[j*m+m-1] + 0.60f*a[j*m]+0.30f*a[j*m+1])/5.0f;
     }
@@ -33,23 +35,16 @@ void cpu_rad_sweep1(T * a, unsigned int n, unsigned int m, unsigned int iters, T
     a = b;
     b = tmp;
   }
-}
 
-template <typename T>
-void cpu_rad_sweep2(T * a, unsigned int n, unsigned int m, unsigned int iters, T * b) {
-  T * tmp;
+  // Make both matrices identical on exit
   for (auto j=0u;j<n;j++) {
-    for (auto i=0u;i<iters;i++) {
-      for (auto k=2u;k<m-2;k++) {
-        b[j*m+k] = (1.70f*a[j*m+k-2] + 1.40f*a[j*m+k-1] + a[j*m+k] + 0.60f*a[j*m+k+1] + 0.30*a[j*m+k+2])/5.0f;
-      }
-      b[j*m+m-2] = (1.70f*a[j*m+m-4] + 1.40f*a[j*m+m-3] + a[j*m+m-2] + 0.60f*a[j*m+m-1]+0.30f*a[j*m])/5.0f;
-      b[j*m+m-1] = (1.70f*a[j*m+m-3] + 1.40f*a[j*m+m-2] + a[j*m+m-1] + 0.60f*a[j*m]+0.30f*a[j*m+1])/5.0f;
+    for (auto k=2u;k<m;k++) {
+      // a has just been operated on so we store the same values in b
+      b[j*m+k] = a[j*m+k];
     }
-    tmp = a;
-    a = b;
-    b = tmp;
   }
+  
+
 }
 
 void get_averages(float * a, unsigned int n, unsigned int m, float * avg) {
@@ -65,7 +60,7 @@ void get_averages(float * a, unsigned int n, unsigned int m, float * avg) {
 // HELPER FUNCTIONS
 
 
-void parse_command_line(const int argc, char ** argv, unsigned int & n, unsigned int & m, unsigned int & iters, long unsigned int & seed, int & print_time, int & cpu_calc, unsigned int & block_size) {
+void parse_command_line(const int argc, char ** argv, unsigned int & n, unsigned int & m, unsigned int & iters, long unsigned int & seed, int & print_time, int & cpu_calc, unsigned int & block_size, int & write_file) {
   int c;
   unsigned int tmp;
 
@@ -75,9 +70,9 @@ void parse_command_line(const int argc, char ** argv, unsigned int & n, unsigned
   // b - choose block size
   // r - seed RNG with time(NULL)
   // h - help
-  while ((c = getopt(argc, argv, "n:m:b:p:rcth")) != -1) {
-    switch(c) {
-      case 'n':
+  while ((c = getopt(argc, argv, "n:m:b:p:rwcth")) != -1) {
+    switch(c) { 
+      case 'n': 
         tmp = std::stoi(optarg); 
         if ((tmp > 1) && (tmp < MAX_DIM)) {
           n = tmp; 
@@ -108,7 +103,7 @@ void parse_command_line(const int argc, char ** argv, unsigned int & n, unsigned
         // Number of iterations
       case 'p':
         tmp = std::stoi(optarg);
-        if ((tmp > 1) && (tmp < MAX_ITER)) {
+        if ((tmp >= 1) && (tmp <= MAX_ITER)) {
           iters = tmp;
         } else {
           std::cout << "Invalid num_iters, using default " << iters << std::endl;
@@ -127,9 +122,13 @@ void parse_command_line(const int argc, char ** argv, unsigned int & n, unsigned
         print_time = 1;
         break;
 
-      case 'c':
+      case 'c': 
         cpu_calc = 0;
-        break;
+        break; 
+      
+      case 'w': 
+        write_file = 1;
+        break; 
 
       case 'h':
         std::cout << "Usage: ./rad [-n ndim] [-m mdim] [-p num_iterations] [-c (skip cpu calculation?)] [-r (seed with time value?)] [-h (help)]" <<std::endl;
@@ -165,7 +164,38 @@ void print_matrix_CPU(float * A, const unsigned int N, const unsigned int M) {
   std::cout << "\n";
 }
 
+void print_matrix_to_file(std::string filename, float * A, const unsigned int N, const unsigned int M) {
+  std::ofstream f1;
+  f1.open(filename);
+  f1 << N << " " << M << '\n';
+  for (auto i=0u;i<N;i++) {
+    for (auto j=0u;j<M;j++) {
+      f1 <<  " " << A[i*M+j] << " ";
+    }
+    f1 << '\n';
+  }
+  f1.close();
+}
+
+void read_matrix_from_file(std::string filename, float * A) {
+  // A needs to be allocated already 
+  unsigned int N, M;
+
+  std::ifstream f1;
+  f1.open(filename);
+  if (f1.fail()) throw std::exception();
+  f1 >> N >> M;
+
+  for (auto i=0u;i<N;i++) {
+    for (auto j=0u;j<M;j++) {
+      f1 >> A[i*M+j];
+    }
+  }
+  f1.close();
+}
+
+
+//template void print_matrix_CPU(float * A, const unsigned int N, const unsigned int M);
+//template void print_matrix_CPU(double * A, const unsigned int N, const unsigned int M);
 template void cpu_rad_sweep1(float * a, unsigned int n, unsigned int m, unsigned int iters, float * b);
-template void cpu_rad_sweep2(float * a, unsigned int n, unsigned int m, unsigned int iters, float * b);
 template void cpu_rad_sweep1(double * a, unsigned int n, unsigned int m, unsigned int iters, double * b);
-template void cpu_rad_sweep2(double * a, unsigned int n, unsigned int m, unsigned int iters, double * b);

@@ -11,8 +11,8 @@ OPT = -O3
 #PARALLEL	= -fopenmp
 #DEFINES		= -DWITH_OPENMP
 CFLAGS		= -W -Wall -std=c++17 $(PARALLEL) $(DEFINES)
-CXXFLAGS	= -W -Wall $(PARALLEL) $(DEFINES) $(OPT)
-NVCCFLAGS	= --use_fast_math -arch=sm_35 -Wno-deprecated-gpu-targets -lineinfo #--ptxas-options=-v
+CXXFLAGS	= -O3 -finline-functions -ffast-math -fomit-frame-pointer -funroll-loops -W -Wall 
+NVCCFLAGS	= -O2 --use_fast_math -arch=sm_35 -Wno-deprecated-gpu-targets -lineinfo #--ptxas-options=-v
 
 LIBS		= $(PARALLEL)
 INCPATH		= /usr/include/
@@ -25,13 +25,13 @@ all: radiator
 OBJECTS 	= cpu_funcs.o gpu_funcs.o 
 TARGET 		= radiator
 
-radiator: main.cu $(OBJECTS)
+radiator: main.cu $(OBJECTS) blockdim.h
 	$(NVCC) -o $@ $< $(OBJECTS) $(NVCCFLAGS)
 
 cpu_funcs.o: cpu_funcs.cpp
 	$(CXX) -c $< $(CXXFLAGS)
 
-gpu_funcs.o: gpu_funcs.cu
+gpu_funcs.o: gpu_funcs.cu blockdim.h
 	$(NVCC) -c $< $(NVCCFLAGS)
 
 .PHONY:
@@ -40,11 +40,13 @@ gpu_funcs.o: gpu_funcs.cu
 clean:
 	$(DEL_FILE) $(OBJECTS) $(TARGET)
 
-test: matrix
-	./test.sh
-
 run: radiator
-	./radiator -n 10 -m 10
+	./radiator -n 1000 -m 1000 -p 1000
 
 prof: radiator
-	nvprof ./radiator -c -n 15360 -m 6400 -p 100
+	nvprof ./radiator -c -n 15360 -m 15360 -p 1000
+
+p=1
+
+test: radiator
+	./radiator -n 12 -m 12 -p $p
