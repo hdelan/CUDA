@@ -62,7 +62,7 @@ __global__ void gpu_rad_sweep2(float * a_d, unsigned int n, unsigned int m, unsi
   }
 }
 
-__global__ void gpu_rad_sweep5(float * a_d, unsigned int n, unsigned int m, unsigned int iters, float * b_d) {
+__global__ void gpu_rad_sweep5(float * a_d, unsigned int n, unsigned int m, unsigned int iters) {
   __shared__ float a_shared[SHARED_DIM];
   int tidx = threadIdx.x;
   int step = blockDim.x;
@@ -201,4 +201,92 @@ __global__ void gpu_rad_sweep5(float * a_d, unsigned int n, unsigned int m, unsi
     }
 
 
+__global__ void gpu_rad_sweep6(float * a_d, unsigned int n, unsigned int m, unsigned int iters) {
+  
+  int shared_dims = 2*(iters+2);
+  
+  //if (shared_dims == m) return;
+  
+  extern __shared__ float a_s[];
+  
+  // a_start, b_start will be for right propogation and 
+  // a_end b_end will be for left propogation
+  float * a_start = a_s;
+  float * b_start = &a_s[2*(iters+2)];
+  float * a_end = &a_s[4*(iters+2)];
+  float * b_end = &a_s[6*(iters+2)];
 
+  float * tmp;
+
+  int tidx = threadIdx.x;
+  int step = blockDim.x;
+  int index = tidx;
+
+  // Initializing the arrays
+  while (index < shared_dims) {
+    a_start[index] = b_start[index] = a_end[index] = b_end[index] = 0.0f;
+    index += step;
+  }
+
+  a_start[0] = b_start[0] = a_end[shared_dims-2] = b_end[shared_dims-2] = (blockIdx.x+1)/ (float)n;
+  a_start[1] = b_start[1] = a_end[shared_dims-1] = b_end[shared_dims-1] = 0.80f * a_start[0];
+
+
+  for (int i=0;i<iters;i++) {
+    __syncthreads();
+
+    // Right propagation
+    index = tidx + 2;
+    while (index < shared_dims-2) {
+      b_start[index] =  (1.70f*a_start[index-2] + 1.40f*a_start[index-1] + a_start[index] + 0.60f*a_start[index+1] + 0.30f*a_start[index+2])/5.0f;
+      if (b_start[index]==0.0f) break;
+      index += step;
+    }
+    
+    // Left propagation
+    index = shared_dims - 3 - tidx;
+    while (index > 1) {
+      b_end[index] =  (1.70f*a_end[index-2] + 1.40f*a_end[index-1] + a_end[index] + 0.60f*a_end[index+1] + 0.30f*a_end[index+2])/5.0f;
+      if (b_end[index]==0.0f) break;
+      index -= step;
+    }
+    
+    // Swapping arrays
+    tmp = a_start;
+    a_start = b_start;
+    b_start = tmp;
+
+    tmp = a_end;
+    a_end = b_end;
+    b_end = tmp;
+  }
+
+  // Writing to global memory
+  int glob_index = blockIdx.x*m + tidx;
+  index = tidx;
+  // Writing right prop
+  while (index < shared_dims) {
+    a_d[glob_index] = a_start[index];
+    index += step;
+    glob_index += step;
+  }
+
+  // Writing left prop
+  glob_index = (blockIdx.x+1)*m - shared_dims + tidx+2;
+  index = tidx;
+  while (index < shared_dims - 2) {
+    a_d[glob_index] = a_end[index];
+    index += step;
+    glob_index += step;
+  }
+}
+
+
+__global__ void gpu_get_averages(float * A_d, unsigned int n, unsigned int m, float * avg_d) {
+  int idx = blockIdx.x*blockDim.x + threadIdx.x;
+  float sum;
+  if (idx < n) {
+    for (int i=0;i<m;i++) sum += A_d[idx*m+i];
+    avg_d[idx] = sum / (float) m;
+  }
+}

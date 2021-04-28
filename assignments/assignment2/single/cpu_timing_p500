@@ -1,0 +1,26 @@
+n: 15360
+m: 15360
+max iters: 500
+print_time: 0
+block_size: 128
+Threads per block: 128
+Num blocks: 120
+CPU Sweep 1 time 353.621513
+=====>Error of individual terms: 
+Difference in entries greater than 1e-5 at 0 of 235929600 points
+GPU bigger at 0 of 0 points.
+Max diff: 7.92742e-06 at index (14734, 324)
+GPU_mat[i]: 0.763069
+CPU_mat[i]: 0.763061
+=====>Error of averages: 
+Difference in entries greater than 1e-5 at 0 of 15360 points
+GPU bigger at 0 of 0 points.
+Max diff: 1.43424e-07 at index (14954, 0)
+GPU_mat[i]: 0.019936
+CPU_mat[i]: 0.0199358
+
+
+GPU Matrix
+
+
+CPU Matrix

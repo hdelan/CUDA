@@ -10,7 +10,10 @@ __global__ void gpu_rad_sweep1(float*, unsigned int, unsigned int, unsigned int,
 __global__ void gpu_rad_sweep2(float*, unsigned int, unsigned int, unsigned int, float*);
 __global__ void gpu_rad_sweep3(float*, unsigned int, unsigned int, unsigned int, float*);
 __global__ void gpu_rad_sweep4(float*, unsigned int, unsigned int, unsigned int, float*);
-__global__ void gpu_rad_sweep5(float*, unsigned int, unsigned int, unsigned int, float*);
+__global__ void gpu_rad_sweep5(float*, unsigned int, unsigned int, unsigned int);
+__global__ void gpu_rad_sweep6(float*, unsigned int, unsigned int, unsigned int);
+
+__global__ void gpu_get_averages(float * a, unsigned int n, unsigned int m, float * avg);
 
 void print_matrix_to_file(std::string filename, float * A, const unsigned int N, const unsigned int M);
 void read_matrix_from_file(std::string filename, float * A);
@@ -48,12 +51,10 @@ int main(int argc, char * argv[]) {
     A[i*m+1] = C[i*m+1] = 0.80f*(float)(i+1)/(float)n;
   }
 
-  float *A_d, *B_d, *avg_d;
+  float *A_d, *avg_d;
   cudaMalloc((void **) &A_d, sizeof(float)*n*m);
-  cudaMalloc((void **) &B_d, sizeof(float)*n*m);
   cudaMalloc((void **) &avg_d, sizeof(float)*n);
   cudaMemcpy(A_d, A, sizeof(float)*n*m, cudaMemcpyHostToDevice);
-  cudaMemcpy(B_d, A, sizeof(float)*n*m, cudaMemcpyHostToDevice);
   
   // Initialize block_size
   dim3 threads {block_size};
@@ -93,9 +94,14 @@ int main(int argc, char * argv[]) {
   //gpu_rad_sweep1<<<blocks, threads>>>(A_d, n, m, num_iters, B_d);
   //gpu_rad_sweep2<<<blocks, threads>>>(A_d, n, m, num_iters, B_d);
   //gpu_rad_sweep3<<<blocks, threads, 5*threads.x*sizeof(float)>>>(A_d, n, m, num_iters, B_d);
-  gpu_rad_sweep5<<<n_blocks, threads>>>(A_d, n, m, num_iters, B_d);
+  if (8*(num_iters+2) < m && 8*(num_iters+2) < 12288) {
+    gpu_rad_sweep6<<<n_blocks, threads, 4*8*(num_iters+2)>>>(A_d, n, m, num_iters);
+  } else {
+    gpu_rad_sweep5<<<n_blocks, threads>>>(A_d, n, m, num_iters);
+  }
 
   cudaMemcpy(A, A_d, sizeof(float)*n*m, cudaMemcpyDeviceToHost);
+
 
   // Print GPU_mat to file
   if (write_mat == 1) print_matrix_to_file(filename, A, n, m);
@@ -103,18 +109,23 @@ int main(int argc, char * argv[]) {
   std::cout << "=====>Error of individual terms: \n";
   // Diff matrices - this will be avoided if there was an error reading in the comparison file
   if (diff_mats == 1) diff_matrices(A, C, n, m);
-  
 
-  float avgC[n], avgA[n];
+
+  // CALCULATE AVERAGES ON CPU
+  float avgC[n], avgA[n], avgD[n];
   get_averages(A, n, m, avgA);
+  gpu_get_averages<<<blocks, threads>>>(A_d, n, m, avg_d);
+  cudaMemcpy(avgD, avg_d, sizeof(float)*n, cudaMemcpyDeviceToHost);
+  std::cout << "=====>Error of GPU_avg function: \n";
+  if (diff_mats == 1) diff_matrices(avgA, avgD, n, 1);
   get_averages(C, n, m, avgC);
-  std::cout << "=====>Error of averages: \n";
+  std::cout << "=====>Error of averages (CPU vs GPU): \n";
   if (diff_mats == 1) diff_matrices(avgA, avgC, n, 1);
-  
-  std::cout << "\n\nGPU Matrix\n";
-  print_matrix_CPU(A, n, m);
-  std::cout << "\n\nCPU Matrix\n";
-  print_matrix_CPU(C, n, m);
+
+  //std::cout << "\n\nGPU Matrix\n";
+  //print_matrix_CPU(A, n, m);
+  //std::cout << "\n\nCPU Matrix\n";
+  //print_matrix_CPU(C, n, m);
   //std::cout << "Averages: \n";
   //print_matrix_CPU(avg, n, 1);
 
@@ -123,6 +134,7 @@ int main(int argc, char * argv[]) {
   cudaProfilerStop();
 
   free(A); free(C);
+  cudaFree(A_d);
 
   return 0;
 }
