@@ -1,7 +1,7 @@
 /**
  * \file:        cpu_funcs.cu
- * \brief:       CUDA Assignment 1:
- *               Some CPU functions for summing rows, summing columns and performing vector reductions, as well as helpers.
+ * \brief:       CUDA Assignment 2:
+ *               Some CPU functions for performing cylindrical radiator finite differences, as well as helpers.
  * \author:      Hugh Delaney
  * \version:     
  * \date:        2021-03-25
@@ -19,6 +19,18 @@ unsigned int MAX_ITER = 2000;
 
 // RADIATOR FUNCTIONS
 
+/* --------------------------------------------------------------------------*/
+/**
+ * \brief:       A naive CPU function to calculate the cylindrical radiator finite
+ *               differences
+ *
+ * \param:       a
+ * \param:       n
+ * \param:       m
+ * \param:       iters
+ * \param:       b
+ */
+/* ----------------------------------------------------------------------------*/
 template <typename T>
 void cpu_rad_sweep1(T * a, unsigned int n, unsigned int m, unsigned int iters, T * b) {
   T * tmp;
@@ -47,6 +59,16 @@ void cpu_rad_sweep1(T * a, unsigned int n, unsigned int m, unsigned int iters, T
 
 }
 
+/* --------------------------------------------------------------------------*/
+/**
+ * \brief:       A function to calculate the row avgs of A and store them in avg
+ *
+ * \param:       a              INPUT
+ * \param:       n
+ * \param:       m
+ * \param:       avg            OUTPUT
+ */
+/* ----------------------------------------------------------------------------*/
 void get_averages(float * a, unsigned int n, unsigned int m, float * avg) {
   for (auto i=0u;i<n;i++) {
     avg[i] = 0.0f;
@@ -60,16 +82,24 @@ void get_averages(float * a, unsigned int n, unsigned int m, float * avg) {
 // HELPER FUNCTIONS
 
 
+/* --------------------------------------------------------------------------*/
+/**
+ * \brief:       Parse the command line
+ *
+ * \param:       argc
+ * \param:       argv
+ * \param:       n              -n      N dim
+ * \param:       m              -m      M dim  
+ * \param:       iters          -p      Number of iterations
+ * \param:       print_time     -t      Print the time taken?
+ * \param:       cpu_calc       -c      Perform the CPU calculation?
+ * \param:       write_file     -w      Write GPU matrix to file?
+ */
+/* ----------------------------------------------------------------------------*/
 void parse_command_line(const int argc, char ** argv, unsigned int & n, unsigned int & m, unsigned int & iters, long unsigned int & seed, int & print_time, int & cpu_calc, unsigned int & block_size, int & write_file) {
   int c;
   unsigned int tmp;
 
-  // Using getopt to parse the command line with options:
-  // n - dimension of n
-  // m - dimension of m
-  // b - choose block size
-  // r - seed RNG with time(NULL)
-  // h - help
   while ((c = getopt(argc, argv, "n:m:b:p:rwcth")) != -1) {
     switch(c) { 
       case 'n': 
@@ -143,7 +173,7 @@ void parse_command_line(const int argc, char ** argv, unsigned int & n, unsigned
 
 /* --------------------------------------------------------------------------*/
 /**
- * \brief:       A function to print a matrix if it is smaller than 100 x 100
+ * \brief:       A function to print a matrix to stdout if it is smaller than 100 x 100
  *
  * \param:       A
  * \param:       N
@@ -164,6 +194,16 @@ void print_matrix_CPU(float * A, const unsigned int N, const unsigned int M) {
   std::cout << "\n";
 }
 
+/* --------------------------------------------------------------------------*/
+/**
+ * \brief:       Prints a full (non-sparse) matrix to file
+ *
+ * \param:       filename
+ * \param:       A
+ * \param:       N
+ * \param:       M
+ */
+/* ----------------------------------------------------------------------------*/
 void print_matrix_to_file(std::string filename, float * A, const unsigned int N, const unsigned int M) {
   std::ofstream f1;
   f1.open(filename);
@@ -177,6 +217,14 @@ void print_matrix_to_file(std::string filename, float * A, const unsigned int N,
   f1.close();
 }
 
+/* --------------------------------------------------------------------------*/
+/**
+ * \brief:       Reads a full (non-sparse) matrix from file
+ *
+ * \param:       filename
+ * \param:       A
+ */
+/* ----------------------------------------------------------------------------*/
 void read_matrix_from_file(std::string filename, float * A) {
   // A needs to be allocated already 
   unsigned int N, M;
@@ -194,7 +242,21 @@ void read_matrix_from_file(std::string filename, float * A) {
   f1.close();
 }
 
+/* --------------------------------------------------------------------------*/
+/**
+ * \brief:       Prints a matrix to a sparse file. Defaults to normal writing 
+ *               if matrix is not sparse
+ *
+ * \param:       filename
+ * \param:       A
+ * \param:       N
+ * \param:       M
+ * \param:       iters
+ */
+/* ----------------------------------------------------------------------------*/
 void print_sparse_matrix_to_file(std::string filename, float * A, const unsigned int N, const unsigned int M, const unsigned int iters) {
+  
+  // If matrix isn't sparse just write it in the normal way
   if (2+4*iters >= M) {
     print_matrix_to_file(filename, A, N, M);
     return;
@@ -218,6 +280,15 @@ void print_sparse_matrix_to_file(std::string filename, float * A, const unsigned
   f1.close();
 }
 
+/* --------------------------------------------------------------------------*/
+/**
+ * \brief:       Reads a matrix from a sparse file. Defaults to normal reading if
+ *               matrix is not sparse.
+ *
+ * \param:       filename
+ * \param:       A
+ */
+/* ----------------------------------------------------------------------------*/
 void read_sparse_matrix_from_file(std::string filename, float * A) {
   // A needs to be allocated already with its elements initialized to zero
   unsigned int N, M, iters;
@@ -227,6 +298,8 @@ void read_sparse_matrix_from_file(std::string filename, float * A) {
   if (f1.fail()) throw std::exception();
   
   f1 >> N >> M >> iters;
+
+  // If matrix isn't sparse just read it in the normal way
   if (2+4*iters >= M) {
     read_matrix_from_file(filename, A);
     return;

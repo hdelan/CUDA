@@ -1,3 +1,11 @@
+/**
+ * \file:        main.cu
+ * \brief:       A main function to calculate the cylindrical radiator finite differences
+ * \author:      Hugh Delaney
+ * \version:     
+ * \date:        2021-04-29
+ */
+
 #include <iostream> 
 #include <iomanip> 
 #include <stdlib.h> 
@@ -5,11 +13,13 @@
 #include <cuda_profiler_api.h> 
 
 #include "blockdim.h"
+#include "cpu_funcs.hpp"
+#include "gpu_funcs.h"
 
+/*
 __global__ void gpu_rad_sweep5(float*, unsigned int, unsigned int, unsigned int);
 __global__ void gpu_rad_sweep6(float*, unsigned int, unsigned int, unsigned int);
 __global__ void gpu_get_averages(float * a, unsigned int n, unsigned int m, float * avg);
-
 void print_matrix_to_file(std::string filename, float * A, const unsigned int N, const unsigned int M);
 void read_matrix_from_file(std::string filename, float * A);
 
@@ -26,7 +36,7 @@ void diff_matrices(float *A, float *B, unsigned int n, unsigned int m);
 
 void parse_command_line(const int argc, char ** argv, unsigned int & n, unsigned int & m, unsigned int & iters, long unsigned int & seed, int & print_time, int & cpu_calc, unsigned int & block_size, int & write_file);
 void print_matrix_CPU(float * A, const unsigned int N, const unsigned int M);
-
+*/
 int main(int argc, char * argv[]) { 
   unsigned int n {15360}, m {15360}, block_size {BLOCK_SIZE}, num_iters {500};
   long unsigned int seed {123};
