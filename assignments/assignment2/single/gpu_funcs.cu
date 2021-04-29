@@ -284,7 +284,7 @@ __global__ void gpu_rad_sweep6(float * a_d, unsigned int n, unsigned int m, unsi
 
 __global__ void gpu_get_averages(float * A_d, unsigned int n, unsigned int m, float * avg_d) {
   int idx = blockIdx.x*blockDim.x + threadIdx.x;
-  float sum;
+  float sum = 0.0f;
   if (idx < n) {
     for (int i=0;i<m;i++) sum += A_d[idx*m+i];
     avg_d[idx] = sum / (float) m;

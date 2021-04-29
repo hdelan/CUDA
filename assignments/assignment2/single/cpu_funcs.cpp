@@ -194,6 +194,57 @@ void read_matrix_from_file(std::string filename, float * A) {
   f1.close();
 }
 
+void print_sparse_matrix_to_file(std::string filename, float * A, const unsigned int N, const unsigned int M, const unsigned int iters) {
+  if (2+4*iters >= M) {
+    print_matrix_to_file(filename, A, N, M);
+    return;
+  }
+  std::ofstream f1;
+  f1.open(filename);
+  f1 << N << " " << M << " " << iters << '\n';
+  for (auto i=0u;i<N;i++) {
+    // Writing left propagation
+    for (auto j=0u;j<2*iters+2;j++) {
+      f1 <<  " " << A[i*M+j] << " ";
+    }
+    
+    // Writing right propagation
+    for (auto j=M-2*iters;j<M;j++) {
+      f1 <<  " " << A[i*M+j] << " ";
+    }
+
+    f1 << '\n';
+  }
+  f1.close();
+}
+
+void read_sparse_matrix_from_file(std::string filename, float * A) {
+  // A needs to be allocated already with its elements initialized to zero
+  unsigned int N, M, iters;
+
+  std::ifstream f1;
+  f1.open(filename);
+  if (f1.fail()) throw std::exception();
+  
+  f1 >> N >> M >> iters;
+  if (2+4*iters >= M) {
+    read_matrix_from_file(filename, A);
+    return;
+  }
+
+  for (auto i=0u;i<N;i++) {
+    // Reading left propagation
+    for (auto j=0u;j<2*iters+2;j++) {
+      f1 >> A[i*M+j];
+    }
+    
+    // Reading right propagation
+    for (auto j=M-2*iters;j<M;j++) {
+      f1 >> A[i*M+j];
+    }
+  }
+  f1.close();
+}
 
 //template void print_matrix_CPU(float * A, const unsigned int N, const unsigned int M);
 //template void print_matrix_CPU(double * A, const unsigned int N, const unsigned int M);
