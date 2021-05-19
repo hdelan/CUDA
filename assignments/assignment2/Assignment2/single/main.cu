@@ -12,37 +12,15 @@
 #include <sys/time.h> 
 #include <cuda_profiler_api.h> 
 
-#include "blockdim.h"
 #include "cpu_funcs.hpp"
 #include "gpu_funcs.h"
 
-/*
-__global__ void gpu_rad_sweep5(float*, unsigned int, unsigned int, unsigned int);
-__global__ void gpu_rad_sweep6(float*, unsigned int, unsigned int, unsigned int);
-__global__ void gpu_get_averages(float * a, unsigned int n, unsigned int m, float * avg);
-void print_matrix_to_file(std::string filename, float * A, const unsigned int N, const unsigned int M);
-void read_matrix_from_file(std::string filename, float * A);
-
-void print_sparse_matrix_to_file(std::string filename, float * A, const unsigned int N, const unsigned int M, const unsigned int iters);
-void read_sparse_matrix_from_file(std::string filename, float * A);
-
-template <typename T>
-void cpu_rad_sweep1(T*, unsigned int, unsigned int, unsigned int, T*);
-template <typename T>
-void cpu_rad_sweep2(T*, unsigned int, unsigned int, unsigned int, T*);
-void get_averages(float * a, unsigned int n, unsigned int m, float * avg);
-
-void diff_matrices(float *A, float *B, unsigned int n, unsigned int m);
-
-void parse_command_line(const int argc, char ** argv, unsigned int & n, unsigned int & m, unsigned int & iters, long unsigned int & seed, int & print_time, int & cpu_calc, unsigned int & block_size, int & write_file);
-void print_matrix_CPU(float * A, const unsigned int N, const unsigned int M);
-*/
 int main(int argc, char * argv[]) { 
-  unsigned int n {15360}, m {15360}, block_size {BLOCK_SIZE}, num_iters {500};
+  unsigned int n {15360}, m {15360}, block_size {32}, num_iters {500};
   long unsigned int seed {123};
-  int print_time {0}, cpu_calc {1}, diff_mats {1}, write_mat {0};
+  int print_time {0}, cpu_calc {1}, diff_mats {1}, write_mat {0}, avg {0};
   struct timeval t1, t2, t3, t4;
-  parse_command_line(argc, argv, n, m, num_iters, seed, print_time, cpu_calc, block_size, write_mat);
+  parse_command_line(argc, argv, n, m, num_iters, seed, print_time, cpu_calc, block_size, write_mat, avg);
 
   std::cout << "n: " << n << "\n";
   std::cout << "m: " << m << "\n";
@@ -107,8 +85,8 @@ int main(int argc, char * argv[]) {
   
   // gpu_rad_sweep6 should only be used when there are zeros in the middle of matrices,
   // otherwise gpu_rad_sweep5 is better. See gpu_funcs.cu
-  if (8*(num_iters+2) < m && 8*(num_iters+2) < 12288) {
-    gpu_rad_sweep6<<<n_blocks, threads, 4*8*(num_iters+2)>>>(A_d, n, m, num_iters);
+  if (8*(num_iters+2) < m && 8*(num_iters+2) < 49152/sizeof(float)) {
+    gpu_rad_sweep6<<<n_blocks, threads, sizeof(float)*8*(num_iters+2)>>>(A_d, n, m, num_iters);
   } else {
     gpu_rad_sweep5<<<n_blocks, threads>>>(A_d, n, m, num_iters);
   }
@@ -151,18 +129,19 @@ int main(int argc, char * argv[]) {
   
   cudaMemcpy(avgD, avg_d, sizeof(float)*n, cudaMemcpyDeviceToHost);
   
-  
   /************ COMPARE RESULTS ****************/
   std::cout << "\n=====>Errors\n";
   std::cout << "   Of matrix elements: \n";
   // Diff matrices - this will be avoided if there was an error reading in the comparison file
   if (diff_mats == 1) diff_matrices(A, C, n, m);
+  
+  if (avg == 1) {
   std::cout << "   Of GPU_avg function: \n";
   if (diff_mats == 1) diff_matrices(avgD, avgA, n, 1);
   get_averages(C, n, m, avgC);
   std::cout << "   Of averages (CPU vs GPU): \n";
   if (diff_mats == 1) diff_matrices(avgA, avgC, n, 1);
-  
+  }
 
   /************ PRINT TIMINGS ******************/
   double cpu_rad_time, cpu_avgs_time;
@@ -176,10 +155,13 @@ int main(int argc, char * argv[]) {
     } else { 
       return 0;
     }
+    
+    printf("\n=====>Radiator timings (block size %d):\n\tCPU_timing: \t%lf\n\tGPU_timing: \t%lf\n\tSpeedup: \t%lf\n\n", block_size, cpu_rad_time, computeFloatGpuTime, cpu_rad_time/computeFloatGpuTime);
 
+    if (avg == 1) {
     cpu_avgs_time = (double)(t4.tv_sec-t3.tv_sec)+((double)(t4.tv_usec - t3.tv_usec)/1000000.0);
-    printf("\n=====>Radiator timings (block size %d):\n\tCPU_timing: \t%lf\n\tGPU_timing: \t%lf\n\tSpeedup: \t%lf\n\n", BLOCK_SIZE, cpu_rad_time, computeFloatGpuTime, cpu_rad_time/computeFloatGpuTime);
-    printf("\n=====>Row average timings (block size %d):\n\tCPU_timing: \t%lf\n\tGPU_timing: \t%lf\n\tSpeedup: \t%lf\n\n", BLOCK_SIZE, cpu_avgs_time, computeFloatGpuTime1, cpu_avgs_time/computeFloatGpuTime1);
+    printf("\n=====>Row average timings (block size %d):\n\tCPU_timing: \t%lf\n\tGPU_timing: \t%lf\n\tSpeedup: \t%lf\n\n", block_size, cpu_avgs_time, computeFloatGpuTime1, cpu_avgs_time/computeFloatGpuTime1);
+  }
   }
   /*
      cudaError_t err = cudaGetLastError();  // add
@@ -192,28 +174,4 @@ int main(int argc, char * argv[]) {
 
   return 0;
 }
-
-void diff_matrices(float *A, float *C, unsigned int n, unsigned int m) {
-  unsigned int index_r=0, index_c=0, count=0, gpu_bigger=0;
-  float max_diff = 0.0f, diff = 0.0f;
-  for (int i=0;i<n*m;i++) {
-    diff = fabs(A[i] - C[i]);
-    if (diff > 0.00001f) {
-      if (A[i] > C[i]) gpu_bigger++;
-      count++;
-    }
-    if (diff > max_diff) {
-      max_diff = diff;
-      index_r = i / m;
-      index_c = i % m;
-    }
-  }
-  std::cout << "\tDifference in entries greater than 1e-5 at " << count << " of " << n*m << " points\n";
-  std::cout << "\tGPU bigger at " << gpu_bigger << " of " << count << " points.\n";
-  std::cout << "\tMax diff: " << max_diff << " at index (" << index_r << ", " << index_c << ")\n";
-  if (max_diff != 0.0f) {
-    std::cout << "\tGPU_mat[i]: " << A[index_r*m+index_c] << "\n\tCPU_mat[i]: " << C[index_r*m+index_c] << "\n";
-  }
-}
-
 

@@ -25,13 +25,13 @@ all: radiator
 OBJECTS 	= cpu_funcs.o gpu_funcs.o 
 TARGET 		= radiator
 
-radiator: main.cu $(OBJECTS) blockdim.h
+radiator: main.cu $(OBJECTS) 
 	$(NVCC) -o $@ $< $(OBJECTS) $(NVCCFLAGS)
 
 cpu_funcs.o: cpu_funcs.cpp
 	$(CXX) -c $< $(CXXFLAGS)
 
-gpu_funcs.o: gpu_funcs.cu blockdim.h
+gpu_funcs.o: gpu_funcs.cu 
 	$(NVCC) -c $< $(NVCCFLAGS)
 
 .PHONY:
@@ -40,13 +40,8 @@ gpu_funcs.o: gpu_funcs.cu blockdim.h
 clean:
 	$(DEL_FILE) $(OBJECTS) $(TARGET)
 
-run: radiator
-	./radiator -n 1000 -m 1000 -p 1000
-
 prof: radiator
-	./radiator -c -n 15360 -m 15360 -p 500 -t
-
-p=1
+	./radiator -c -n 15360 -m 15360 -p 500 -t -a
 
 test: radiator
-	./radiator -n 12 -m 12 -p $p
+	./test.sh 

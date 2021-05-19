@@ -9,6 +9,7 @@
 
 #include <iostream> 
 #include <fstream> 
+#include <cmath> 
 #include <iomanip> 
 #include <stdlib.h> 
 #include <unistd.h> 
@@ -37,11 +38,11 @@ void cpu_rad_sweep1(T * a, unsigned int n, unsigned int m, unsigned int iters, T
   for (auto i=0u;i<iters;i++) {
     for (auto j=0u;j<n;j++) {
       for (auto k=2u;k<m-2;k++) {
-        b[j*m+k] = (1.70f*a[j*m+k-2] + 1.40f*a[j*m+k-1] + a[j*m+k] + 0.60f*a[j*m+k+1] + 0.30*a[j*m+k+2])/5.0f;
+        b[j*m+k] = (1.70*a[j*m+k-2] + 1.40*a[j*m+k-1] + a[j*m+k] + 0.60*a[j*m+k+1] + 0.30*a[j*m+k+2])/5.0;
       }
       // Getting the end terms
-      b[j*m+m-2] = (1.70f*a[j*m+m-4] + 1.40f*a[j*m+m-3] + a[j*m+m-2] + 0.60f*a[j*m+m-1]+0.30f*a[j*m])/5.0f;
-      b[j*m+m-1] = (1.70f*a[j*m+m-3] + 1.40f*a[j*m+m-2] + a[j*m+m-1] + 0.60f*a[j*m]+0.30f*a[j*m+1])/5.0f;
+      b[j*m+m-2] = (1.70*a[j*m+m-4] + 1.40*a[j*m+m-3] + a[j*m+m-2] + 0.60*a[j*m+m-1]+0.30*a[j*m])/5.0;
+      b[j*m+m-1] = (1.70*a[j*m+m-3] + 1.40*a[j*m+m-2] + a[j*m+m-1] + 0.60*a[j*m]+0.30*a[j*m+1])/5.0;
     }
     tmp = a;
     a = b;
@@ -69,13 +70,13 @@ void cpu_rad_sweep1(T * a, unsigned int n, unsigned int m, unsigned int iters, T
  * \param:       avg            OUTPUT
  */
 /* ----------------------------------------------------------------------------*/
-void get_averages(float * a, unsigned int n, unsigned int m, float * avg) {
+void get_averages(double * a, unsigned int n, unsigned int m, double * avg) {
   for (auto i=0u;i<n;i++) {
-    avg[i] = 0.0f;
+    avg[i] = 0.0;
     for (auto j=0u;j<m;j++) {
       avg[i] += a[i*m+j];
     }
-    avg[i] /= (float) m;
+    avg[i] /= (double) m;
   }
 }
 
@@ -94,13 +95,14 @@ void get_averages(float * a, unsigned int n, unsigned int m, float * avg) {
  * \param:       print_time     -t      Print the time taken?
  * \param:       cpu_calc       -c      Perform the CPU calculation?
  * \param:       write_file     -w      Write GPU matrix to file?
+ * \param:       avg            -a      Get row avgs?
  */
 /* ----------------------------------------------------------------------------*/
-void parse_command_line(const int argc, char ** argv, unsigned int & n, unsigned int & m, unsigned int & iters, long unsigned int & seed, int & print_time, int & cpu_calc, unsigned int & block_size, int & write_file) {
+void parse_command_line(const int argc, char ** argv, unsigned int & n, unsigned int & m, unsigned int & iters, long unsigned int & seed, int & print_time, int & cpu_calc, unsigned int & block_size, int & write_file, int & avg) {
   int c;
   unsigned int tmp;
 
-  while ((c = getopt(argc, argv, "n:m:b:p:rwcth")) != -1) {
+  while ((c = getopt(argc, argv, "n:m:b:p:rwcath")) != -1) {
     switch(c) { 
       case 'n': 
         tmp = std::stoi(optarg); 
@@ -151,6 +153,10 @@ void parse_command_line(const int argc, char ** argv, unsigned int & n, unsigned
       case 't':
         print_time = 1;
         break;
+      
+      case 'a':
+        avg = 1;
+        break;
 
       case 'c': 
         cpu_calc = 0;
@@ -180,7 +186,7 @@ void parse_command_line(const int argc, char ** argv, unsigned int & n, unsigned
  * \param:       M
  */
 /* ----------------------------------------------------------------------------*/
-void print_matrix_CPU(float * A, const unsigned int N, const unsigned int M) {
+void print_matrix_CPU(double * A, const unsigned int N, const unsigned int M) {
   if (N > 100 || M > 100) {
     return;
   }	
@@ -204,7 +210,7 @@ void print_matrix_CPU(float * A, const unsigned int N, const unsigned int M) {
  * \param:       M
  */
 /* ----------------------------------------------------------------------------*/
-void print_matrix_to_file(std::string filename, float * A, const unsigned int N, const unsigned int M) {
+void print_matrix_to_file(std::string filename, double * A, const unsigned int N, const unsigned int M) {
   std::ofstream f1;
   f1.open(filename);
   f1 << N << " " << M << '\n';
@@ -225,7 +231,7 @@ void print_matrix_to_file(std::string filename, float * A, const unsigned int N,
  * \param:       A
  */
 /* ----------------------------------------------------------------------------*/
-void read_matrix_from_file(std::string filename, float * A) {
+void read_matrix_from_file(std::string filename, double * A) {
   // A needs to be allocated already 
   unsigned int N, M;
 
@@ -254,7 +260,7 @@ void read_matrix_from_file(std::string filename, float * A) {
  * \param:       iters
  */
 /* ----------------------------------------------------------------------------*/
-void print_sparse_matrix_to_file(std::string filename, float * A, const unsigned int N, const unsigned int M, const unsigned int iters) {
+void print_sparse_matrix_to_file(std::string filename, double * A, const unsigned int N, const unsigned int M, const unsigned int iters) {
   
   // If matrix isn't sparse just write it in the normal way
   if (2+4*iters >= M) {
@@ -289,7 +295,7 @@ void print_sparse_matrix_to_file(std::string filename, float * A, const unsigned
  * \param:       A
  */
 /* ----------------------------------------------------------------------------*/
-void read_sparse_matrix_from_file(std::string filename, float * A) {
+void read_sparse_matrix_from_file(std::string filename, double * A) {
   // A needs to be allocated already with its elements initialized to zero
   unsigned int N, M, iters;
 
@@ -319,7 +325,38 @@ void read_sparse_matrix_from_file(std::string filename, float * A) {
   f1.close();
 }
 
-//template void print_matrix_CPU(float * A, const unsigned int N, const unsigned int M);
-//template void print_matrix_CPU(double * A, const unsigned int N, const unsigned int M);
-template void cpu_rad_sweep1(float * a, unsigned int n, unsigned int m, unsigned int iters, float * b);
+/* --------------------------------------------------------------------------*/
+/**
+ * \brief:       Takes two matrices and prints to stdout their differences   
+ *            
+ *
+ * \param:       A
+ * \param:       C
+ */
+/* ----------------------------------------------------------------------------*/
+void diff_matrices(double *A, double *C, unsigned int n, unsigned int m) {
+  unsigned int index_r=0, index_c=0, count=0, gpu_bigger=0;
+  double max_diff = 0.0, diff = 0.0;
+  for (auto i=0u;i<n*m;i++) {
+    diff = fabs(A[i] - C[i]);
+    if (diff > 0.00001f) {
+      if (A[i] > C[i]) gpu_bigger++;
+      count++;
+    }
+    if (diff > max_diff) {
+      max_diff = diff;
+      index_r = i / m;
+      index_c = i % m;
+    }
+  }
+  std::cout << "\tDifference in entries greater than 1e-5 at " << count << " of " << n*m << " points\n";
+  std::cout << "\tGPU bigger at " << gpu_bigger << " of " << count << " points.\n";
+  std::cout << "\tMax diff: " << max_diff << " at index (" << index_r << ", " << index_c << ")\n";
+  if (max_diff != 0.0) {
+    std::cout << "\tGPU_mat[i]: " << A[index_r*m+index_c] << "\n\tCPU_mat[i]: " << C[index_r*m+index_c] << "\n";
+  }
+}
+
 template void cpu_rad_sweep1(double * a, unsigned int n, unsigned int m, unsigned int iters, double * b);
+
+

@@ -1,0 +1,400 @@
+n: 15360
+m: 15360
+iters: 500
+print_time: 1
+block_size: 2
+Num blocks: 15360
+Reading SPARSE CPU-generated comparison matrix from file.
+Finished reading sparse matrix from file. Time taken: 11.109149
+
+=====>Errors
+   Of matrix elements: 
+	Difference in entries greater than 1e-5 at 0 of 235929600 points
+	GPU bigger at 0 of 0 points.
+	Max diff: 5.08538e-07 at index (15259, 3)
+	GPU_mat[i]: 0.844446
+	CPU_mat[i]: 0.844447
+   Of GPU_avg function: 
+	Difference in entries greater than 1e-5 at 0 of 15360 points
+	GPU bigger at 0 of 0 points.
+	Max diff: 3.46945e-18 at index (11755, 0)
+	GPU_mat[i]: 0.0156714
+	CPU_mat[i]: 0.0156714
+   Of averages (CPU vs GPU): 
+	Difference in entries greater than 1e-5 at 0 of 15360 points
+	GPU bigger at 0 of 0 points.
+	Max diff: 7.14278e-09 at index (5199, 0)
+	GPU_mat[i]: 0.00693189
+	CPU_mat[i]: 0.00693188
+
+=====>Radiator timings (block size 2):
+	CPU_timing: 	245.574000
+	GPU_timing: 	11.784572
+	Speedup: 	20.838602
+
+
+=====>Row average timings (block size 2):
+	CPU_timing: 	0.194106
+	GPU_timing: 	0.023614
+	Speedup: 	8.220060
+
+n: 15360
+m: 15360
+iters: 500
+print_time: 1
+block_size: 4
+Num blocks: 15360
+Reading SPARSE CPU-generated comparison matrix from file.
+Finished reading sparse matrix from file. Time taken: 11.122926
+
+=====>Errors
+   Of matrix elements: 
+	Difference in entries greater than 1e-5 at 0 of 235929600 points
+	GPU bigger at 0 of 0 points.
+	Max diff: 5.08538e-07 at index (15259, 3)
+	GPU_mat[i]: 0.844446
+	CPU_mat[i]: 0.844447
+   Of GPU_avg function: 
+	Difference in entries greater than 1e-5 at 0 of 15360 points
+	GPU bigger at 0 of 0 points.
+	Max diff: 3.46945e-18 at index (11755, 0)
+	GPU_mat[i]: 0.0156714
+	CPU_mat[i]: 0.0156714
+   Of averages (CPU vs GPU): 
+	Difference in entries greater than 1e-5 at 0 of 15360 points
+	GPU bigger at 0 of 0 points.
+	Max diff: 7.14278e-09 at index (5199, 0)
+	GPU_mat[i]: 0.00693189
+	CPU_mat[i]: 0.00693188
+
+=====>Radiator timings (block size 4):
+	CPU_timing: 	245.574000
+	GPU_timing: 	5.993201
+	Speedup: 	40.975434
+
+
+=====>Row average timings (block size 4):
+	CPU_timing: 	0.193266
+	GPU_timing: 	0.016108
+	Speedup: 	11.998496
+
+n: 15360
+m: 15360
+iters: 500
+print_time: 1
+block_size: 8
+Num blocks: 15360
+Reading SPARSE CPU-generated comparison matrix from file.
+Finished reading sparse matrix from file. Time taken: 11.116575
+
+=====>Errors
+   Of matrix elements: 
+	Difference in entries greater than 1e-5 at 0 of 235929600 points
+	GPU bigger at 0 of 0 points.
+	Max diff: 5.08538e-07 at index (15259, 3)
+	GPU_mat[i]: 0.844446
+	CPU_mat[i]: 0.844447
+   Of GPU_avg function: 
+	Difference in entries greater than 1e-5 at 0 of 15360 points
+	GPU bigger at 0 of 0 points.
+	Max diff: 3.46945e-18 at index (11755, 0)
+	GPU_mat[i]: 0.0156714
+	CPU_mat[i]: 0.0156714
+   Of averages (CPU vs GPU): 
+	Difference in entries greater than 1e-5 at 0 of 15360 points
+	GPU bigger at 0 of 0 points.
+	Max diff: 7.14278e-09 at index (5199, 0)
+	GPU_mat[i]: 0.00693189
+	CPU_mat[i]: 0.00693188
+
+=====>Radiator timings (block size 8):
+	CPU_timing: 	245.574000
+	GPU_timing: 	3.134684
+	Speedup: 	78.340915
+
+
+=====>Row average timings (block size 8):
+	CPU_timing: 	0.193218
+	GPU_timing: 	0.014743
+	Speedup: 	13.105938
+
+n: 15360
+m: 15360
+iters: 500
+print_time: 1
+block_size: 16
+Num blocks: 15360
+Reading SPARSE CPU-generated comparison matrix from file.
+Finished reading sparse matrix from file. Time taken: 11.101584
+
+=====>Errors
+   Of matrix elements: 
+	Difference in entries greater than 1e-5 at 0 of 235929600 points
+	GPU bigger at 0 of 0 points.
+	Max diff: 5.08538e-07 at index (15259, 3)
+	GPU_mat[i]: 0.844446
+	CPU_mat[i]: 0.844447
+   Of GPU_avg function: 
+	Difference in entries greater than 1e-5 at 0 of 15360 points
+	GPU bigger at 0 of 0 points.
+	Max diff: 3.46945e-18 at index (11755, 0)
+	GPU_mat[i]: 0.0156714
+	CPU_mat[i]: 0.0156714
+   Of averages (CPU vs GPU): 
+	Difference in entries greater than 1e-5 at 0 of 15360 points
+	GPU bigger at 0 of 0 points.
+	Max diff: 7.14278e-09 at index (5199, 0)
+	GPU_mat[i]: 0.00693189
+	CPU_mat[i]: 0.00693188
+
+=====>Radiator timings (block size 16):
+	CPU_timing: 	245.574000
+	GPU_timing: 	1.674699
+	Speedup: 	146.637730
+
+
+=====>Row average timings (block size 16):
+	CPU_timing: 	0.192806
+	GPU_timing: 	0.015007
+	Speedup: 	12.847786
+
+n: 15360
+m: 15360
+iters: 500
+print_time: 1
+block_size: 32
+Num blocks: 15360
+Reading SPARSE CPU-generated comparison matrix from file.
+Finished reading sparse matrix from file. Time taken: 11.119182
+
+=====>Errors
+   Of matrix elements: 
+	Difference in entries greater than 1e-5 at 0 of 235929600 points
+	GPU bigger at 0 of 0 points.
+	Max diff: 5.08538e-07 at index (15259, 3)
+	GPU_mat[i]: 0.844446
+	CPU_mat[i]: 0.844447
+   Of GPU_avg function: 
+	Difference in entries greater than 1e-5 at 0 of 15360 points
+	GPU bigger at 0 of 0 points.
+	Max diff: 3.46945e-18 at index (11755, 0)
+	GPU_mat[i]: 0.0156714
+	CPU_mat[i]: 0.0156714
+   Of averages (CPU vs GPU): 
+	Difference in entries greater than 1e-5 at 0 of 15360 points
+	GPU bigger at 0 of 0 points.
+	Max diff: 7.14278e-09 at index (5199, 0)
+	GPU_mat[i]: 0.00693189
+	CPU_mat[i]: 0.00693188
+
+=====>Radiator timings (block size 32):
+	CPU_timing: 	245.574000
+	GPU_timing: 	0.968958
+	Speedup: 	253.441242
+
+
+=====>Row average timings (block size 32):
+	CPU_timing: 	0.193172
+	GPU_timing: 	0.014024
+	Speedup: 	13.774795
+
+n: 15360
+m: 15360
+iters: 500
+print_time: 1
+block_size: 64
+Num blocks: 15360
+Reading SPARSE CPU-generated comparison matrix from file.
+Finished reading sparse matrix from file. Time taken: 11.134557
+
+=====>Errors
+   Of matrix elements: 
+	Difference in entries greater than 1e-5 at 0 of 235929600 points
+	GPU bigger at 0 of 0 points.
+	Max diff: 5.08538e-07 at index (15259, 3)
+	GPU_mat[i]: 0.844446
+	CPU_mat[i]: 0.844447
+   Of GPU_avg function: 
+	Difference in entries greater than 1e-5 at 0 of 15360 points
+	GPU bigger at 0 of 0 points.
+	Max diff: 3.46945e-18 at index (11755, 0)
+	GPU_mat[i]: 0.0156714
+	CPU_mat[i]: 0.0156714
+   Of averages (CPU vs GPU): 
+	Difference in entries greater than 1e-5 at 0 of 15360 points
+	GPU bigger at 0 of 0 points.
+	Max diff: 7.14278e-09 at index (5199, 0)
+	GPU_mat[i]: 0.00693189
+	CPU_mat[i]: 0.00693188
+
+=====>Radiator timings (block size 64):
+	CPU_timing: 	245.574000
+	GPU_timing: 	0.812881
+	Speedup: 	302.103240
+
+
+=====>Row average timings (block size 64):
+	CPU_timing: 	0.193818
+	GPU_timing: 	0.014034
+	Speedup: 	13.810429
+
+n: 15360
+m: 15360
+iters: 500
+print_time: 1
+block_size: 128
+Num blocks: 15360
+Reading SPARSE CPU-generated comparison matrix from file.
+Finished reading sparse matrix from file. Time taken: 11.118322
+
+=====>Errors
+   Of matrix elements: 
+	Difference in entries greater than 1e-5 at 0 of 235929600 points
+	GPU bigger at 0 of 0 points.
+	Max diff: 5.08538e-07 at index (15259, 3)
+	GPU_mat[i]: 0.844446
+	CPU_mat[i]: 0.844447
+   Of GPU_avg function: 
+	Difference in entries greater than 1e-5 at 0 of 15360 points
+	GPU bigger at 0 of 0 points.
+	Max diff: 3.46945e-18 at index (11755, 0)
+	GPU_mat[i]: 0.0156714
+	CPU_mat[i]: 0.0156714
+   Of averages (CPU vs GPU): 
+	Difference in entries greater than 1e-5 at 0 of 15360 points
+	GPU bigger at 0 of 0 points.
+	Max diff: 7.14278e-09 at index (5199, 0)
+	GPU_mat[i]: 0.00693189
+	CPU_mat[i]: 0.00693188
+
+=====>Radiator timings (block size 128):
+	CPU_timing: 	245.574000
+	GPU_timing: 	0.916396
+	Speedup: 	267.978169
+
+
+=====>Row average timings (block size 128):
+	CPU_timing: 	0.193127
+	GPU_timing: 	0.013940
+	Speedup: 	13.854637
+
+n: 15360
+m: 15360
+iters: 500
+print_time: 1
+block_size: 256
+Num blocks: 15360
+Reading SPARSE CPU-generated comparison matrix from file.
+Finished reading sparse matrix from file. Time taken: 11.107440
+
+=====>Errors
+   Of matrix elements: 
+	Difference in entries greater than 1e-5 at 0 of 235929600 points
+	GPU bigger at 0 of 0 points.
+	Max diff: 5.08538e-07 at index (15259, 3)
+	GPU_mat[i]: 0.844446
+	CPU_mat[i]: 0.844447
+   Of GPU_avg function: 
+	Difference in entries greater than 1e-5 at 0 of 15360 points
+	GPU bigger at 0 of 0 points.
+	Max diff: 3.46945e-18 at index (11755, 0)
+	GPU_mat[i]: 0.0156714
+	CPU_mat[i]: 0.0156714
+   Of averages (CPU vs GPU): 
+	Difference in entries greater than 1e-5 at 0 of 15360 points
+	GPU bigger at 0 of 0 points.
+	Max diff: 7.14278e-09 at index (5199, 0)
+	GPU_mat[i]: 0.00693189
+	CPU_mat[i]: 0.00693188
+
+=====>Radiator timings (block size 256):
+	CPU_timing: 	245.574000
+	GPU_timing: 	1.144752
+	Speedup: 	214.521591
+
+
+=====>Row average timings (block size 256):
+	CPU_timing: 	0.193133
+	GPU_timing: 	0.014421
+	Speedup: 	13.392342
+
+n: 15360
+m: 15360
+iters: 500
+print_time: 1
+block_size: 512
+Num blocks: 15360
+Reading SPARSE CPU-generated comparison matrix from file.
+Finished reading sparse matrix from file. Time taken: 11.099892
+
+=====>Errors
+   Of matrix elements: 
+	Difference in entries greater than 1e-5 at 0 of 235929600 points
+	GPU bigger at 0 of 0 points.
+	Max diff: 5.08538e-07 at index (15259, 3)
+	GPU_mat[i]: 0.844446
+	CPU_mat[i]: 0.844447
+   Of GPU_avg function: 
+	Difference in entries greater than 1e-5 at 0 of 15360 points
+	GPU bigger at 0 of 0 points.
+	Max diff: 3.46945e-18 at index (11755, 0)
+	GPU_mat[i]: 0.0156714
+	CPU_mat[i]: 0.0156714
+   Of averages (CPU vs GPU): 
+	Difference in entries greater than 1e-5 at 0 of 15360 points
+	GPU bigger at 0 of 0 points.
+	Max diff: 7.14278e-09 at index (5199, 0)
+	GPU_mat[i]: 0.00693189
+	CPU_mat[i]: 0.00693188
+
+=====>Radiator timings (block size 512):
+	CPU_timing: 	245.574000
+	GPU_timing: 	1.524614
+	Speedup: 	161.072916
+
+
+=====>Row average timings (block size 512):
+	CPU_timing: 	0.193167
+	GPU_timing: 	0.014183
+	Speedup: 	13.619546
+
+n: 15360
+m: 15360
+iters: 500
+print_time: 1
+block_size: 1024
+Num blocks: 15360
+Reading SPARSE CPU-generated comparison matrix from file.
+Finished reading sparse matrix from file. Time taken: 11.118517
+
+=====>Errors
+   Of matrix elements: 
+	Difference in entries greater than 1e-5 at 0 of 235929600 points
+	GPU bigger at 0 of 0 points.
+	Max diff: 5.08538e-07 at index (15259, 3)
+	GPU_mat[i]: 0.844446
+	CPU_mat[i]: 0.844447
+   Of GPU_avg function: 
+	Difference in entries greater than 1e-5 at 0 of 15360 points
+	GPU bigger at 0 of 0 points.
+	Max diff: 3.46945e-18 at index (11755, 0)
+	GPU_mat[i]: 0.0156714
+	CPU_mat[i]: 0.0156714
+   Of averages (CPU vs GPU): 
+	Difference in entries greater than 1e-5 at 0 of 15360 points
+	GPU bigger at 0 of 0 points.
+	Max diff: 7.14278e-09 at index (5199, 0)
+	GPU_mat[i]: 0.00693189
+	CPU_mat[i]: 0.00693188
+
+=====>Radiator timings (block size 1024):
+	CPU_timing: 	245.574000
+	GPU_timing: 	1.821460
+	Speedup: 	134.822588
+
+
+=====>Row average timings (block size 1024):
+	CPU_timing: 	0.193192
+	GPU_timing: 	0.019374
+	Speedup: 	9.971575
+

@@ -1,0 +1,27 @@
+n: 15360
+m: 15360
+iters: 500
+print_time: 0
+block_size: 256
+Num blocks: 15360
+Finished CPU operation. Time taken: 248.574511
+
+=====>Errors
+   Of matrix elements: 
+	Difference in entries greater than 1e-5 at 0 of 235929600 points
+	GPU bigger at 0 of 0 points.
+	Max diff: 1.19209e-08 at index (15359, 1)
+	GPU_mat[i]: 0.8
+	CPU_mat[i]: 0.8
+   Of GPU_avg function: 
+	Difference in entries greater than 1e-5 at 0 of 15360 points
+	GPU bigger at 0 of 0 points.
+	Max diff: 3.46945e-18 at index (11755, 0)
+	GPU_mat[i]: 0.0156714
+	CPU_mat[i]: 0.0156714
+   Of averages (CPU vs GPU): 
+	Difference in entries greater than 1e-5 at 0 of 15360 points
+	GPU bigger at 0 of 0 points.
+	Max diff: 1.88642e-10 at index (15359, 0)
+	GPU_mat[i]: 0.0204757
+	CPU_mat[i]: 0.0204757
