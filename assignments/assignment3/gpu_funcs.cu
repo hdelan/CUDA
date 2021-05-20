@@ -14,17 +14,16 @@
 #define BLOCK_SIZE 32
 
 using namespace std;
-__global__ void GPU_exponentialIntegralDouble_1 (const double start, const double end, const int num_samples, double division, double * A);
-
 
 __global__ void GPU_exponentialIntegralDouble_1 (const double start, const double end, const int num_samples, double division, double * A) {
-        int n=blockIdx.x+1;
-        /*constant*/ const double eulerConstant=0.5772156649015329;
-        /*constant*/ double epsilon=1.E-30;
-        /*constant*/ double bigDouble=1.E100;
+        __shared__ int n; n=blockIdx.x+1;
+        __shared__ double eulerConstant; eulerConstant=0.5772156649015329;
+        __shared__ double psi;
+        __shared__ double epsilon; epsilon=1.E-30;
+        __shared__ double bigDouble; bigDouble=1.E100;
         int i,ii,nm1=n-1;
-        double x,a=start,b=end,c,d,del,fact,h,psi,ans=0.0;
-        auto glob_idx {blockIdx.x*n+threadIdx.x}, idx {threadIdx.x}, step {blockDim.x};
+        double x,a=start,b=end,c,d,del,fact,h,ans=0.0;
+        auto idx {threadIdx.x}, step {blockDim.x};
 
         if (n==0) {
                 while (idx < num_samples) {
@@ -89,3 +88,203 @@ __global__ void GPU_exponentialIntegralDouble_1 (const double start, const doubl
         }
 }
 
+__global__ void GPU_exponentialIntegralDouble_2 (const double start, const double end, const int num_samples, const int max_n, double division, double * A) {
+        int n=threadIdx.x+1;
+        __shared__ double eulerConstant; eulerConstant=0.5772156649015329;
+        __shared__ double psi;
+        __shared__ double epsilon; epsilon=1.E-30;
+        __shared__ double bigDouble; bigDouble=1.E100;
+        int i,ii,nm1=n-1;
+        double x=start+blockIdx.x*division,a=start,b=end,c,d,del,fact,h,ans=0.0;
+        auto idx {threadIdx.x}, step {blockDim.x};
+
+        if (n==0) {
+                while (idx < num_samples) {
+                        x = a+division*idx;
+                        A[idx] = exp(-x)/x;
+                        idx += step;
+                }
+        } else {
+                if (x<=1.0) {
+                        while (nm1 < max_n) {
+                                ans=(nm1!=0 ? 1.0/nm1 : -log(x)-eulerConstant);	// First term
+                                fact=1.0;
+                                for (i=1;i<=20000000;i++) {
+                                        fact*=-x/i;
+                                        if (i != nm1) {
+                                                del = -fact/(i-nm1);
+                                        } else {
+                                                psi = -eulerConstant;
+                                                for (ii=1;ii<=nm1;ii++) {
+                                                        psi += 1.0/ii;
+                                                }
+                                                del=fact*(-log(x)+psi);
+                                        }
+                                        ans+=del;
+                                        if (fabs(del)<fabs(ans)*epsilon) {
+                                                //A[nm1*num_samples+blockIdx.x] = ans;
+                                                A[nm1+num_samples*blockIdx.x] = ans;
+                                                n+=step;
+                                                nm1+=step;
+                                                break;
+                                        }
+                                }
+                                if (i==2000000) printf("Series failed in exponential integral");
+                        }
+                }
+                else {
+                        while (nm1 < max_n) {
+                                b=x+n;
+                                c=bigDouble;
+                                d=1.0/b;
+                                h=d;
+                                for (i=1;i<=20000000;i++) {
+                                        a=-i*(nm1+i);
+                                        b+=2.0;
+                                        d=1.0/(a*d+b);
+                                        c=b+a/c;
+                                        del=c*d;
+                                        h*=del;
+                                        if (fabs(del-1.0)<=epsilon) {
+                                                ans=h*exp(-x);
+                                                //A[nm1*num_samples+blockIdx.x] = ans;
+                                                A[nm1+num_samples*blockIdx.x] = ans;
+                                                n+=step;
+                                                nm1+=step;
+                                                break;
+                                        }
+                                }
+                        }
+                }
+        }
+}
+
+__global__ void GPU_exponentialIntegralDouble_3 (const double start, const double end, const int num_samples, const int max_n, double division, double * A) {
+        int idx = blockIdx.x*blockDim.x+threadIdx.x;
+        int idy = blockIdx.y*blockDim.y+threadIdx.y;
+        int n=idy+1;
+        double x=(idx)*division+start;
+        __shared__ double eulerConstant; eulerConstant=0.5772156649015329;
+        __shared__ double psi;
+        __shared__ double epsilon; epsilon=1.E-30;
+        __shared__ double bigDouble; bigDouble=1.E100;
+        int i,ii,nm1=n-1;
+        double a=start,b=end,c,d,del,fact,h,ans=0.0;
+
+        if (idx >= num_samples || idy >= max_n) return;
+
+        if (n==0) {
+                A[idy*num_samples+idx] = exp(-x)/x;
+                return;
+        } else {
+                if (x<=1.0) {
+                        ans=(nm1!=0 ? 1.0/nm1 : -log(x)-eulerConstant);	// First term
+                        fact=1.0;
+                        for (i=1;i<=20000000;i++) {
+                                fact*=-x/i;
+                                if (i != nm1) {
+                                        del = -fact/(i-nm1);
+                                } else {
+                                        psi = -eulerConstant;
+                                        for (ii=1;ii<=nm1;ii++) {
+                                                psi += 1.0/ii;
+                                        }
+                                        del=fact*(-log(x)+psi);
+                                }
+                                ans+=del;
+                                if (fabs(del)<fabs(ans)*epsilon) {
+                                        A[idy*num_samples+idx] = ans;
+                                        return;
+                                }
+                        }
+                        if (i==2000000) printf("Series failed in exponential integral");
+                }
+                else {
+                        b=x+n;
+                        c=bigDouble;
+                        d=1.0/b;
+                        h=d;
+                        for (i=1;i<=20000000;i++) {
+                                a=-i*(nm1+i);
+                                b+=2.0;
+                                d=1.0/(a*d+b);
+                                c=b+a/c;
+                                del=c*d;
+                                h*=del;
+                                if (fabs(del-1.0)<=epsilon) {
+                                        ans=h*exp(-x);
+                                        A[idy*num_samples+idx] = ans;
+                                        return;
+                                }
+                        }
+                }
+        }
+}
+
+__global__ void GPU_exponentialIntegralDouble_4 (const double start, const double end, const int num_samples, const int max_n, double division, double * A) {
+        int idx = blockIdx.x*blockDim.x+threadIdx.x;
+        int idy = blockIdx.y*blockDim.y+threadIdx.y;
+        int n=idx+1;
+        double x=(idy)*division+start;
+        /*
+        __shared__ double eulerConstant; eulerConstant=0.5772156649015329;
+        __shared__ double psi;
+        __shared__ double epsilon; epsilon=1.E-30;
+        __shared__ double bigDouble; bigDouble=1.E100;
+        */
+        double eulerConstant=0.5772156649015329;
+        double psi;
+        double epsilon=1.E-30;
+        double bigDouble=1.E300;
+        int i,ii,nm1=n-1;
+        double a=start,b=end,c,d,del,fact,h,ans=0.0;
+
+        if (idy >= num_samples || idx >= max_n) return;
+
+        if (n==0) {
+                A[idx*num_samples+idy] = exp(-x)/x;
+                return;
+        } else {
+                if (x<=1.0) {
+                        ans=(nm1!=0 ? 1.0/nm1 : -log(x)-eulerConstant);	// First term
+                        fact=1.0;
+                        for (i=1;i<=20000000;i++) {
+                                fact*=-x/i;
+                                if (i != nm1) {
+                                        del = -fact/(i-nm1);
+                                } else {
+                                        psi = -eulerConstant;
+                                        for (ii=1;ii<=nm1;ii++) {
+                                                psi += 1.0/ii;
+                                        }
+                                        del=fact*(-log(x)+psi);
+                                }
+                                ans+=del;
+                                if (fabs(del)<fabs(ans)*epsilon) {
+                                        A[idx*num_samples+idy] = ans;
+                                        return;
+                                }
+                        }
+                        if (i==2000000) printf("Series failed in exponential integral");
+                }
+                else {
+                        b=x+n;
+                        c=bigDouble;
+                        d=1.0/b;
+                        h=d;
+                        for (i=1;i<=20000000;i++) {
+                                a=-i*(nm1+i);
+                                b+=2.0;
+                                d=1.0/(a*d+b);
+                                c=b+a/c;
+                                del=c*d;
+                                h*=del;
+                                if (fabs(del-1.0)<=epsilon) {
+                                        ans=h*exp(-x);
+                                        A[idx*num_samples+idy] = ans;
+                                        return;
+                                }
+                        }
+                }
+        }
+}

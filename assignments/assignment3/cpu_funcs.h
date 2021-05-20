@@ -13,17 +13,12 @@
 #include <unistd.h>
 #include <iomanip>
 
-bool verbose,timing,cpu,gpu;
-int maxIterations;
-unsigned int n,numberOfSamples;
-double a,b;	// The interval that we are going to use
-
-int parseArguments (int argc, char *argv[]);
 void printUsage ();
 void diff_matrices(float *A, float *C, unsigned int n, unsigned int m);
 void diff_matrices(double *A, double *C, unsigned int n, unsigned int m);
 void print_matrix_CPU(double * A, const unsigned int N, const unsigned int M);
 double exponentialIntegralDouble (const int n,const double x);
 float exponentialIntegralFloat (const int n,const float x);
+int parseArguments (int argc, char *argv[], int & maxIterations, unsigned & n, unsigned & numberOfSamples, double & a, double & b, bool & timing, bool & verbose, bool &);
 
 #endif

@@ -10,20 +10,11 @@ NVCCFLAGS	= --use_fast_math -arch=sm_35 -Wno-deprecated-gpu-targets -lineinfo #-
 
 INCPATH       	= -I. -I.
 
-TARGET		=expint_gpu
+TARGET		=expint
 OBJECTS		=gpu_funcs.o cpu_funcs.o
 EXEC		=exponentialIntegral.out
 
-
-all: $(TARGET)
-#	$(CC) -Wall -o ${EXEC} ${TARGET}
-	$(CC) -Wall -o ${EXEC} ${TARGET} -lefence
-	
-
-%.o: %.cpp Makefile
-	$(CC) $(CFLAGS) -c $(INCPATH) $<
-	
-expint_gpu: main.cu gpu_funcs.o cpu_funcs.o
+expint: main.cu gpu_funcs.o cpu_funcs.o
 	$(NVCC) -o $@ $^ $(NVCCFLAGS)
 
 gpu_funcs.o: gpu_funcs.cu
@@ -38,8 +29,8 @@ cpu_funcs.o: cpu_funcs.cpp
 clean:
 	$(DEL_FILE) *.o $(TARGET)
 
-prof: gpu_funcs
-	sudo nvprof ./gpu_funcs
+prof: expint
+	sudo nvprof ./expint -n 10000 -m 10000 -c
 
-run: gpu_funcs
-	./expint_gpu
+run: expint
+	./expint

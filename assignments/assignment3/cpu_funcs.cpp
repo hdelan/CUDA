@@ -5,39 +5,10 @@
 
 #include "cpu_funcs.h"
 
+#define maxIterations 2000000
+
 using namespace std;
 
-int parseArguments (int argc, char *argv[]) {
-        int c;
-
-        while ((c = getopt (argc, argv, "cghn:m:a:b:tv")) != -1) {
-                switch(c) {
-                        case 'c':
-                                cpu=false; break;	 //Skip the CPU test
-                        case 'h':
-                                printUsage(); exit(0); break;
-                        case 'i':
-                                maxIterations = atoi(optarg); break;
-                        case 'n':
-                                n = atoi(optarg); break;
-                        case 'm':
-                                numberOfSamples = atoi(optarg); break;
-                        case 'a':
-                                a = atof(optarg); break;
-                        case 'b':
-                                b = atof(optarg); break;
-                        case 't':
-                                timing = true; break;
-                        case 'v':
-                                verbose = true; break;
-                        default:
-                                fprintf(stderr, "Invalid option given\n");
-                                printUsage();
-                                return -1;
-                }
-        }
-        return 0;
-}
 void printUsage () {
         printf("exponentialIntegral program\n");
         printf("by: Jose Mauricio Refojo <refojoj@tcd.ie>\n");
@@ -264,3 +235,34 @@ float exponentialIntegralFloat (const int n,const float x) {
         return ans;
 }
 
+int parseArguments (int argc, char *argv[], int & maxIts, unsigned & n, unsigned & numberOfSamples, double & a, double & b, bool & timing, bool & verbose, bool & cpu) {
+        int c;
+
+        while ((c = getopt (argc, argv, "cghn:m:a:b:tv")) != -1) {
+                switch(c) {
+                        case 'c':
+                                cpu=false; break;	 //Skip the CPU test
+                        case 'h':
+                                printUsage(); exit(0); break;
+                        case 'i':
+                                maxIts = atoi(optarg); break;
+                        case 'n':
+                                n = atoi(optarg); break;
+                        case 'm':
+                                numberOfSamples = atoi(optarg); break;
+                        case 'a':
+                                a = atof(optarg); break;
+                        case 'b':
+                                b = atof(optarg); break;
+                        case 't':
+                                timing = true; break;
+                        case 'v':
+                                verbose = true; break;
+                        default:
+                                fprintf(stderr, "Invalid option given\n");
+                                printUsage();
+                                return -1;
+                }
+        }
+        return 0;
+}

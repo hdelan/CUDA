@@ -17,27 +17,33 @@
 
 #include "cpu_funcs.h"
 
-#define BLOCK_SIZE 32
+#define BLOCK_SIZE 64
+
+#define XBLOCK 64
+#define YBLOCK 16
+
 
 using namespace std;
+
 __global__ void GPU_exponentialIntegralDouble_1 (const double start, const double end, const int num_samples, double division, double * A);
+__global__ void GPU_exponentialIntegralDouble_2 (const double start, const double end, const int num_samples, const int max_n, double division, double * A);
+__global__ void GPU_exponentialIntegralDouble_3 (const double start, const double end, const int num_samples, const int max_n, double division, double * A);
+__global__ void GPU_exponentialIntegralDouble_4 (const double start, const double end, const int num_samples, const int max_n, double division, double * A);
 
 int main(int argc, char *argv[]) {
         unsigned int ui,uj;
-        cpu=true, gpu=true;
-        verbose=false;
-        timing=true;
+        bool cpu=true, gpu=true, verbose=false, timing=true;
         // n is the maximum order of the exponential integral that we are going to test
         // numberOfSamples is the number of samples in the interval [0,10] that we are going to calculate
-        n=10;
-        numberOfSamples=10;
-        a=0.0;
-        b=10.0;
-        maxIterations=2000000000;
+        unsigned n=10;
+        unsigned numberOfSamples=10;
+        double a=0.0;
+        double b=10.0;
+        int maxIterations=2000000000;
 
         struct timeval expoStart, expoEnd;
 
-        parseArguments(argc, argv);
+        parseArguments (argc, argv, maxIterations, n, numberOfSamples, a, b, timing, verbose, cpu);
 
         if (verbose) {
                 cout << "n=" << n << endl;
@@ -106,7 +112,8 @@ int main(int argc, char *argv[]) {
         }
 
         if (gpu) {
-                dim3 blocks {n}, threads{BLOCK_SIZE};
+                dim3 blocks1 {n}, blocks2 {numberOfSamples}, threads {BLOCK_SIZE}; 
+                dim3 blocks3 {numberOfSamples/XBLOCK+1, n/YBLOCK+1}, threads3 {XBLOCK, YBLOCK};
                 double *A_d;
                 cudaMalloc((void **) &A_d, sizeof(double)*numberOfSamples*n);
 
@@ -115,7 +122,10 @@ int main(int argc, char *argv[]) {
                         exit(1);
                 }
 
-                GPU_exponentialIntegralDouble_1<<<blocks, threads>>>(a+division, b, numberOfSamples, division, A_d);
+                GPU_exponentialIntegralDouble_2<<<blocks2, threads>>>(a+division, b, numberOfSamples, n, division, A_d);
+                GPU_exponentialIntegralDouble_1<<<blocks1, threads>>>(a+division, b, numberOfSamples, division, A_d);
+                GPU_exponentialIntegralDouble_3<<<blocks3, threads3>>>(a+division, b, numberOfSamples, n, division, A_d);
+                GPU_exponentialIntegralDouble_4<<<blocks3, threads3>>>(a+division, b, numberOfSamples, n, division, A_d);
 
                 double * resultsDoubleGpu {(double*)malloc(sizeof(double)*numberOfSamples*n)};
                 cudaMemcpy(resultsDoubleGpu, A_d, sizeof(double)*numberOfSamples*n, cudaMemcpyDeviceToHost);
@@ -126,8 +136,10 @@ int main(int argc, char *argv[]) {
                 printf("\n\nCPU version:\n\n");
                 print_matrix_CPU(resultsDoubleCpu, n, numberOfSamples);
                 
-                std::cout << "=====>Error Checking" << std::endl;
-                diff_matrices(resultsDoubleGpu, resultsDoubleCpu, n, numberOfSamples);
+                if (cpu) {
+                        std::cout << "=====>Error Checking" << std::endl;
+                        diff_matrices(resultsDoubleGpu, resultsDoubleCpu, n, numberOfSamples);
+                }
 
         }
 
