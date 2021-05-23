@@ -30,7 +30,10 @@ clean:
 	$(DEL_FILE) *.o $(TARGET)
 
 prof: expint
-	sudo nvprof ./expint -n 10000 -m 10000 -c
+	nvprof ./expint -n 20000 -m 20000 -c
 
 run: expint
 	./expint
+
+test: expint
+	cuda-memcheck ./expint -n 10 -m 10

@@ -159,10 +159,10 @@ __global__ void GPU_exponentialIntegralDouble_2 (const double start, const doubl
         }
 }
 
-__global__ void GPU_exponentialIntegralDouble_3 (const double start, const double end, const int num_samples, const int max_n, double division, double * A) {
+__global__ void GPU_exponentialIntegralDouble_3 (const double start, const double end, const int num_samples, const int start_n, const int max_n, double division, double * A) {
         int idx = blockIdx.x*blockDim.x+threadIdx.x;
         int idy = blockIdx.y*blockDim.y+threadIdx.y;
-        int n=idy+1;
+        int n=idy+start_n;
         double x=(idx)*division+start;
         __shared__ double eulerConstant; eulerConstant=0.5772156649015329;
         __shared__ double psi;
@@ -170,8 +170,11 @@ __global__ void GPU_exponentialIntegralDouble_3 (const double start, const doubl
         __shared__ double bigDouble; bigDouble=1.E100;
         int i,ii,nm1=n-1;
         double a=start,b=end,c,d,del,fact,h,ans=0.0;
-
-        if (idx >= num_samples || idy >= max_n) return;
+        int dev;
+        cudaGetDevice(&dev);
+        //if (blockIdx.x+threadIdx.x==0) printf("Running for device %d\n", dev);
+        
+        if (idx >= num_samples || n >= max_n) return;
 
         if (n==0) {
                 A[idy*num_samples+idx] = exp(-x)/x;
