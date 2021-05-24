@@ -5,8 +5,6 @@
 
 #include "cpu_funcs.h"
 
-#define maxIterations 2000000
-
 using namespace std;
 
 void printUsage () {
@@ -235,17 +233,17 @@ float exponentialIntegralFloat (const int n,const float x) {
         return ans;
 }
 
-int parseArguments (int argc, char *argv[], int & maxIts, unsigned & n, unsigned & numberOfSamples, double & a, double & b, bool & timing, bool & verbose, bool & cpu) {
+int parseArguments (int argc, char *argv[]) {
         int c;
 
-        while ((c = getopt (argc, argv, "cghn:m:a:b:tv")) != -1) {
+        while ((c = getopt (argc, argv, "cshn:m:a:b:tv")) != -1) {
                 switch(c) {
                         case 'c':
                                 cpu=false; break;	 //Skip the CPU test
                         case 'h':
                                 printUsage(); exit(0); break;
                         case 'i':
-                                maxIts = atoi(optarg); break;
+                                maxIterations = atoi(optarg); break;
                         case 'n':
                                 n = atoi(optarg); break;
                         case 'm':
@@ -256,6 +254,8 @@ int parseArguments (int argc, char *argv[], int & maxIts, unsigned & n, unsigned
                                 b = atof(optarg); break;
                         case 't':
                                 timing = true; break;
+                        case 's':
+                                split = true; break;
                         case 'v':
                                 verbose = true; break;
                         default:

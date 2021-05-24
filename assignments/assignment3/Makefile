@@ -6,7 +6,7 @@ DEL_FILE= 	rm -f
 #CFLAGS= -g -pedantic -W -Wall -L/usr/lib
 CFLAGS		= -W -Wall -std=c++17 $(PARALLEL) $(DEFINES)
 CXXFLAGS	= -finline-functions -ffast-math -fomit-frame-pointer -funroll-loops -W -Wall 
-NVCCFLAGS	= --use_fast_math -arch=sm_35 -Wno-deprecated-gpu-targets -lineinfo #--ptxas-options=-v
+NVCCFLAGS	= --use_fast_math -arch=sm_35 -Wno-deprecated-gpu-targets -lineinfo # -rdc=true #--ptxas-options=-v
 
 INCPATH       	= -I. -I.
 

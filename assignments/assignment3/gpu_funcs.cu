@@ -22,7 +22,7 @@ using namespace std;
 __global__ void GPU_exponentialIntegralDouble_1 (const double start, const double end, const int num_samples, double division, double * A) {
         __shared__ int n; n=blockIdx.x+1;
         __shared__ double eulerConstant; eulerConstant=C_eulerConstant; //0.5772156649015329;
-        if(blockIdx.x+threadIdx.x==0) printf("Got Euler constant %lf from constant memory!\n", C_eulerConstant);
+        //if(blockIdx.x+threadIdx.x==0) printf("Got Euler constant %lf from constant memory!\n",eulerConstant);
         __shared__ double psi;
         __shared__ double epsilon; epsilon=1.E-30;
         __shared__ double bigDouble; bigDouble=1.E100;

@@ -25,22 +25,30 @@
 
 using namespace std;
 
+bool cpu=true, gpu=true, verbose=false, timing=true, split=false;
+double a=0.0;
+double b=10.0;
+unsigned numberOfSamples=10;
+unsigned n=10;
+int maxIterations=2000000000;
+
 __constant__ double C_eulerConstant;
 
 int main(int argc, char *argv[]) {
   unsigned int ui,uj;
-  bool cpu=true, gpu=true, verbose=false, timing=true, split=false;
+ /* bool cpu=true, gpu=true, verbose=false, timing=true, split=false;
   // n is the maximum order of the exponential integral that we are going to test
   // numberOfSamples is the number of samples in the interval [0,10] that we are going to calculate
   unsigned n=10;
   unsigned numberOfSamples=10;
   double a=0.0;
   double b=10.0;
-  int maxIterations=2000000000;
+  int maxIterations=2000000000;*/
 
   struct timeval expoStart, expoEnd;
 
-  parseArguments (argc, argv, maxIterations, n, numberOfSamples, a, b, timing, verbose, cpu);
+  //parseArguments (argc, argv, maxIterations, n, numberOfSamples, a, b, timing, verbose, cpu, split);
+  parseArguments (argc, argv);
 
   if (verbose) {
     cout << "n=" << n << endl;
