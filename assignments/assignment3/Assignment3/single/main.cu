@@ -13,15 +13,15 @@
 using namespace std;
 
 bool cpu=true, gpu=true, verbose=false, timing=true, split=false;
-double a=0.0;
-double b=10.0;
-double division;
+float a=0.0;
+float b=10.0;
+float division;
 unsigned numberOfSamples=10;
 unsigned n=10;
 unsigned block_size=32, yblock;
 int maxIterations=2000000000;
 
-__constant__ double C_eulerConstant;
+__constant__ float C_eulerConstant;
 
 int main(int argc, char *argv[]) {
   unsigned int ui,uj;
@@ -60,22 +60,16 @@ int main(int argc, char *argv[]) {
   }
 
   float * resultsFloatCpu;
-  double * resultsDoubleCpu;
 
-  double timeTotalCpu=0.0;
+  float timeTotalCpu=0.0;
 
   try {
     resultsFloatCpu = (float *) malloc(sizeof(float)*numberOfSamples*n);
   } catch (std::bad_alloc const&) {
     cout << "resultsFloatCpu memory allocation fail!" << endl;	exit(1);
   }
-  try {
-    resultsDoubleCpu = (double *) malloc(sizeof(double)*numberOfSamples*n);
-  } catch (std::bad_alloc const&) {
-    cout << "resultsDoubleCpu memory allocation fail!" << endl;	exit(1);
-  }
 
-  double x,division=(b-a)/((double)(numberOfSamples));
+  float x,division=(b-a)/((float)(numberOfSamples));
 
   if (cpu) {
     gettimeofday(&expoStart, NULL);
@@ -83,7 +77,6 @@ int main(int argc, char *argv[]) {
       for (uj=1;uj<=numberOfSamples;uj++) {
         x=a+uj*division;
         resultsFloatCpu[(ui-1)*numberOfSamples+uj-1]=exponentialIntegralFloat (ui,x);
-        resultsDoubleCpu[(ui-1)*numberOfSamples+uj-1]=exponentialIntegralDouble (ui,x);
       }
     }
     gettimeofday(&expoEnd, NULL);
@@ -98,18 +91,18 @@ int main(int argc, char *argv[]) {
 
   if (verbose) {
     if (cpu) {
-      //outputResultsCpu (resultsFloatCpu,resultsDoubleCpu);
+      //outputResultsCpu (resultsFloatCpu,resultsFloatCpu);
     }
   }
   
   // GPU EXECUTION
   if (gpu) {
 
-    double * resultsDoubleGpu;
+    float * resultsFloatGpu;
     try {
-      resultsDoubleGpu = (double *) malloc(sizeof(double)*numberOfSamples*n);
+      resultsFloatGpu = (float *) malloc(sizeof(float)*numberOfSamples*n);
     } catch (std::bad_alloc const&) {
-      cout << "resultsDoubleGpu memory allocation fail!" << endl;	exit(1);
+      cout << "resultsFloatGpu memory allocation fail!" << endl;	exit(1);
     }
     if (n<0.0 || x<0.0 || (x==0.0&&( (n==0) || (n==1) ) ) ) {
       cout << "Bad arguments were passed to the exponentialIntegral function call" << endl;
@@ -117,25 +110,25 @@ int main(int argc, char *argv[]) {
     }
     if (split) {
       /*************** USE 2 GPUS **************/
-      launch_on_two_cards(resultsDoubleGpu, n, numberOfSamples, a, b, division, block_size, yblock, gpu_time);
+      launch_on_two_cards(resultsFloatGpu, n, numberOfSamples, a, b, division, block_size, yblock, gpu_time);
 
     } else { 
       /*************** USE 1 GPU **************/
-      launch_on_one_card(resultsDoubleGpu, n, numberOfSamples, a, b, division, block_size, yblock, gpu_time);
+      launch_on_one_card(resultsFloatGpu, n, numberOfSamples, a, b, division, block_size, yblock, gpu_time);
 
     }
 
 
 
     if (n<=100&&numberOfSamples<=100) printf("GPU version:\n\n");
-    print_matrix_CPU(resultsDoubleGpu, n, numberOfSamples);
+    print_matrix_CPU(resultsFloatGpu, n, numberOfSamples);
 
     if (n<=100&&numberOfSamples<=100) printf("\n\nCPU version:\n\n");
-    print_matrix_CPU(resultsDoubleCpu, n, numberOfSamples);
+    print_matrix_CPU(resultsFloatCpu, n, numberOfSamples);
 
     if (cpu) {
       std::cout << "\n=====>Error Checking" << std::endl;
-      diff_matrices(resultsDoubleGpu, resultsDoubleCpu, n, numberOfSamples);
+      diff_matrices(resultsFloatGpu, resultsFloatCpu, n, numberOfSamples);
       std::cout << "\n=====>Timings (seconds)" << std::endl;
 
       std::cout << "\tCPU:\t\t" << timeTotalCpu << std::endl;
