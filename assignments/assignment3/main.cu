@@ -16,19 +16,16 @@
 #include <iomanip>
 
 #include "cpu_funcs.h"
+#include "gpu_funcs.h"
 
 #define BLOCK_SIZE 512
 
 #define XBLOCK 512
 #define YBLOCK 2
 
-
 using namespace std;
 
-__global__ void GPU_exponentialIntegralDouble_1 (const double start, const double end, const int num_samples, double division, double * A);
-__global__ void GPU_exponentialIntegralDouble_2 (const double start, const double end, const int num_samples, const int max_n, double division, double * A);
-__global__ void GPU_exponentialIntegralDouble_3 (const double start, const double end, const int num_samples, const int start_n, const int max_n, double division, double * A);
-__global__ void GPU_exponentialIntegralDouble_4 (const double start, const double end, const int num_samples, const int max_n, double division, double * A);
+__constant__ double C_eulerConstant;
 
 int main(int argc, char *argv[]) {
   unsigned int ui,uj;
@@ -148,6 +145,8 @@ int main(int argc, char *argv[]) {
 
 
     } else { 
+      double euler=0.5772156649015329;
+      cudaMemcpyToSymbol(C_eulerConstant, &euler, sizeof(double));
       dim3 blocks1 {n}, blocks2 {numberOfSamples}, threads {BLOCK_SIZE}; 
       dim3 blocks3 {numberOfSamples/XBLOCK+1, n/YBLOCK+1}, threads3 {XBLOCK, YBLOCK};
       double *A_d;
