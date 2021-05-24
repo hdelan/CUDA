@@ -236,7 +236,7 @@ float exponentialIntegralFloat (const int n,const float x) {
 int parseArguments (int argc, char *argv[]) {
         int c;
 
-        while ((c = getopt (argc, argv, "cshn:m:a:b:tv")) != -1) {
+        while ((c = getopt (argc, argv, "cshn:m:k:a:b:tv")) != -1) {
                 switch(c) {
                         case 'c':
                                 cpu=false; break;	 //Skip the CPU test
@@ -252,6 +252,8 @@ int parseArguments (int argc, char *argv[]) {
                                 a = atof(optarg); break;
                         case 'b':
                                 b = atof(optarg); break;
+                        case 'k':
+                                block_size = atoi(optarg); break;
                         case 't':
                                 timing = true; break;
                         case 's':

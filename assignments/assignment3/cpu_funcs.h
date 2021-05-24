@@ -15,7 +15,7 @@
 
 extern bool cpu, gpu, verbose, timing, split;
 extern double a, b;
-extern unsigned numberOfSamples, n;
+extern unsigned numberOfSamples, n, block_size;
 extern int maxIterations;
 
 void printUsage ();

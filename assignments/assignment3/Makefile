@@ -29,11 +29,16 @@ cpu_funcs.o: cpu_funcs.cpp
 clean:
 	$(DEL_FILE) *.o $(TARGET)
 
-prof: expint
-	nvprof ./expint -n 20000 -m 20000 -c
+k=32
+
+prof1: expint
+	./expint -n 20000 -m 20000 -c -v -k $k
+
+prof2: expint
+	./expint -n 20000 -m 20000 -c -s -v -k $k
 
 run: expint
-	./expint
+	./expint 
 
 test: expint
 	cuda-memcheck ./expint -n 10 -m 10
