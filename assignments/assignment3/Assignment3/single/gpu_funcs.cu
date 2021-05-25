@@ -213,16 +213,17 @@ void launch_on_one_card(float * & resultsFloatGpu, const unsigned n, const unsig
   float *A_d;
   cudaMalloc((void **) &A_d, sizeof(float)*numberOfSamples*n);
   
+  // RUN KERNEL
   if (dynamic) {
+          printf("Running dynamically parallel kernel on 1 card\n");
           dim3 blocks {n/block_size+1}, threads {block_size};
           GPU_exponentialIntegralFloat_4_launch<<<blocks,threads>>> 
-                  (a, b, numberOfSamples, 1, n+1, division, A_d);
+                  (a+division, b, numberOfSamples, 1, n+1, division, A_d);
   } else {
 
           dim3 blocks {numberOfSamples/block_size+1, n/yblock+1}, threads {block_size, yblock};
-
-          // RUN KERNEL
-          GPU_exponentialIntegralFloat_3<<<blocks, threads>>>(a+division, b, numberOfSamples, 1, n+1, division, A_d);
+          GPU_exponentialIntegralFloat_3<<<blocks, threads>>>
+                  (a+division, b, numberOfSamples, 1, n+1, division, A_d);
   }
   cudaMemcpy(resultsFloatGpu, A_d, sizeof(float)*numberOfSamples*n, cudaMemcpyDeviceToHost);
 
@@ -246,21 +247,23 @@ __global__ void GPU_exponentialIntegralFloat_4_launch (const float start, const 
                 for (int ii=1;ii<=n-1;ii++) {
                         psi += 1.0f/ii;
                 }
-        } else (psi = 0.0);
-                GPU_exponentialIntegralFloat_4_execute<<<num_samples/blockDim.x+1, blockDim.x>>>
-                        (start, end, num_samples, n, division, psi, A);
+        } else {
+                psi = 0.0;
+        }
+        GPU_exponentialIntegralFloat_4_execute<<<num_samples/blockDim.x+1, blockDim.x>>>
+                (start, end, num_samples, n, division, psi, A);
          
 
 }
 
 
 
-void GPU_exponentialIntegralFloat_4_execute (const float start, const float end, const int num_samples, const int n, const float division, const float psi_precomputed, float * A) {
+__global__ void GPU_exponentialIntegralFloat_4_execute (const float start, const float end, const int num_samples, const int n, const float division, const float psi_precomputed, float * A) {
         __shared__ float eulerConstant; eulerConstant=0.5772156649015329f;
         __shared__ float psi; psi=psi_precomputed;
         __shared__ float epsilon; epsilon=1.E-30;
         __shared__ float bigFloat; bigFloat=1.E100;
-        int i,ii,nm1=n-1;
+        int i,nm1=n-1;
         float a=start,b=end,c,d,del,fact,h,ans=0.0f;
 
         int idx=blockIdx.x*blockDim.x+threadIdx.x;

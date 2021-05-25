@@ -16,7 +16,7 @@
 
 __global__ void GPU_exponentialIntegralFloat_3 (const float start, const float end, const int num_samples, const int start_n, const int max_n, float division, float * A);
 __global__ void GPU_exponentialIntegralFloat_4_launch (const float start, const float end, const int num_samples, const int start_n, const int max_n, float division, float * A);
-void GPU_exponentialIntegralFloat_4_execute (const float start, const float end, const int num_samples, const int n, const float division, const float psi_precomputed, float * A);
+__global__ void GPU_exponentialIntegralFloat_4_execute (const float start, const float end, const int num_samples, const int n, const float division, const float psi_precomputed, float * A);
 
 
 void launch_on_one_card(float * & resultsFloatGpu, const unsigned n, const unsigned numberOfSamples, const float a, const float b, const float division, const unsigned block_size, const unsigned yblock, float & time_taken);
