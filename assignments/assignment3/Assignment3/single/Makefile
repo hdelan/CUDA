@@ -41,4 +41,4 @@ run: expint
 	./expint 
 
 test: expint
-	cuda-memcheck ./expint -n 10 -m 10
+	./test.sh
