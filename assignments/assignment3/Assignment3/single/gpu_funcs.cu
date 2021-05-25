@@ -8,6 +8,9 @@
                  Other functions are wrappers to run and time this kernel on one 
                  or two cards.
 
+                 Also includes dynamically parallel kernels, whose performance is
+                 poor. Inclusion is merely for interest, not for implementation.
+
  * \author:      Hugh Delaney
  * \version:     
  * \date:        2021-05-24
