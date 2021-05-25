@@ -44,12 +44,12 @@ __global__ void GPU_exponentialIntegralFloat_3 (const float start, const float e
         int idy = blockIdx.y*blockDim.y+threadIdx.y;
         int n=idy+start_n;
         float x=(idx)*division+start;
-        __shared__ float eulerConstant; eulerConstant=0.5772156649015329;
+        __shared__ float eulerConstant; eulerConstant=0.5772156649015329f;
         __shared__ float psi;
         __shared__ float epsilon; epsilon=1.E-30;
         __shared__ float bigFloat; bigFloat=1.E100;
         int i,ii,nm1=n-1;
-        float a=start,b=end,c,d,del,fact,h,ans=0.0;
+        float a=start,b=end,c,d,del,fact,h,ans=0.0f;
         int dev;
         cudaGetDevice(&dev);
         //if (blockIdx.x+threadIdx.x==0) printf("Running for device %d\n", dev);
@@ -61,8 +61,8 @@ __global__ void GPU_exponentialIntegralFloat_3 (const float start, const float e
                 return;
         } else {
                 if (x<=1.0) {
-                        ans=(nm1!=0 ? 1.0/nm1 : -log(x)-eulerConstant);	// First term
-                        fact=1.0;
+                        ans=(nm1!=0 ? 1.0f/nm1 : -log(x)-eulerConstant);	// First term
+                        fact=1.0f;
                         for (i=1;i<=20000000;i++) {
                                 fact*=-x/i;
                                 if (i != nm1) {
@@ -70,7 +70,7 @@ __global__ void GPU_exponentialIntegralFloat_3 (const float start, const float e
                                 } else {
                                         psi = -eulerConstant;
                                         for (ii=1;ii<=nm1;ii++) {
-                                                psi += 1.0/ii;
+                                                psi += 1.0f/ii;
                                         }
                                         del=fact*(-log(x)+psi);
                                 }
@@ -85,16 +85,16 @@ __global__ void GPU_exponentialIntegralFloat_3 (const float start, const float e
                 else {
                         b=x+n;
                         c=bigFloat;
-                        d=1.0/b;
+                        d=1.0f/b;
                         h=d;
                         for (i=1;i<=20000000;i++) {
                                 a=-i*(nm1+i);
-                                b+=2.0;
-                                d=1.0/(a*d+b);
+                                b+=2.0f;
+                                d=1.0f/(a*d+b);
                                 c=b+a/c;
                                 del=c*d;
                                 h*=del;
-                                if (fabs(del-1.0)<=epsilon) {
+                                if (fabs(del-1.0f)<=epsilon) {
                                         ans=h*exp(-x);
                                         A[idy*num_samples+idx] = ans;
                                         return;
@@ -200,20 +200,30 @@ void launch_on_two_cards(float * & resultsFloatGpu, const unsigned n, const unsi
  */
 /* ----------------------------------------------------------------------------*/
 void launch_on_one_card(float * & resultsFloatGpu, const unsigned n, const unsigned numberOfSamples, const float a, const float b, const float division, const unsigned block_size, const unsigned yblock, float & time_taken) {
+
+  bool dynamic {false};
+
   // TIMINGS
   cudaEvent_t computeFloatGpuStart, computeFloatGpuEnd;
   float computeFloatGpuElapsedTime,computeFloatGpuTime;
   cudaEventCreate(&computeFloatGpuStart);
   cudaEventCreate(&computeFloatGpuEnd);
   cudaEventRecord(computeFloatGpuStart, 0); // We use 0 here because it is the "default" stream
-  
-  dim3 blocks3 {numberOfSamples/block_size+1, n/yblock+1}, threads3 {block_size, yblock};
+          
   float *A_d;
   cudaMalloc((void **) &A_d, sizeof(float)*numberOfSamples*n);
+  
+  if (dynamic) {
+          dim3 blocks {n/block_size+1}, threads {block_size};
+          GPU_exponentialIntegralFloat_4_launch<<<blocks,threads>>> 
+                  (a, b, numberOfSamples, 1, n+1, division, A_d);
+  } else {
 
-  // RUN KERNEL
-  GPU_exponentialIntegralFloat_3<<<blocks3, threads3>>>(a+division, b, numberOfSamples, 1, n+1, division, A_d);
+          dim3 blocks {numberOfSamples/block_size+1, n/yblock+1}, threads {block_size, yblock};
 
+          // RUN KERNEL
+          GPU_exponentialIntegralFloat_3<<<blocks, threads>>>(a+division, b, numberOfSamples, 1, n+1, division, A_d);
+  }
   cudaMemcpy(resultsFloatGpu, A_d, sizeof(float)*numberOfSamples*n, cudaMemcpyDeviceToHost);
 
   // TIMINGS
@@ -221,8 +231,79 @@ void launch_on_one_card(float * & resultsFloatGpu, const unsigned n, const unsig
   cudaEventSynchronize(computeFloatGpuStart);  // This is optional, we shouldn't need it
   cudaEventSynchronize(computeFloatGpuEnd); // This isn't - we need to wait for the event to finish
   cudaEventElapsedTime(&computeFloatGpuElapsedTime, computeFloatGpuStart, computeFloatGpuEnd);
-  computeFloatGpuTime=(float)(computeFloatGpuElapsedTime)*0.001;
-  
+  computeFloatGpuTime=(float)(computeFloatGpuElapsedTime)*0.001f;
+
   if (timing) printf("Total GPU timings: %E seconds\n", computeFloatGpuTime);
   time_taken = computeFloatGpuTime;
+}
+
+
+__global__ void GPU_exponentialIntegralFloat_4_launch (const float start, const float end, const int num_samples, const int start_n, const int max_n, float division, float * A) {
+        int n=blockIdx.x*blockDim.x+threadIdx.x+1;
+        if (n >= max_n) return;
+        float psi=-0.5772156649015329f;
+        if (start <= 1.0f) {
+                for (int ii=1;ii<=n-1;ii++) {
+                        psi += 1.0f/ii;
+                }
+        } else (psi = 0.0);
+                GPU_exponentialIntegralFloat_4_execute<<<num_samples/blockDim.x+1, blockDim.x>>>
+                        (start, end, num_samples, n, division, psi, A);
+         
+
+}
+
+
+
+void GPU_exponentialIntegralFloat_4_execute (const float start, const float end, const int num_samples, const int n, const float division, const float psi_precomputed, float * A) {
+        __shared__ float eulerConstant; eulerConstant=0.5772156649015329f;
+        __shared__ float psi; psi=psi_precomputed;
+        __shared__ float epsilon; epsilon=1.E-30;
+        __shared__ float bigFloat; bigFloat=1.E100;
+        int i,ii,nm1=n-1;
+        float a=start,b=end,c,d,del,fact,h,ans=0.0f;
+
+        int idx=blockIdx.x*blockDim.x+threadIdx.x;
+
+        float x = idx*division+start;
+
+        if (idx >= num_samples || n==0) return;
+
+        if (x<=1.0f) {
+                ans=(nm1!=0 ? 1.0f/nm1 : -log(x)-eulerConstant);	// First term
+                fact=1.0f;
+                for (i=1;i<=20000000;i++) {
+                        fact*=-x/i;
+                        if (i != nm1) {
+                                del = -fact/(i-nm1);
+                        } else {
+                                del=fact*(-log(x)+psi);
+                        }
+                        ans+=del;
+                        if (fabs(del)<fabs(ans)*epsilon) {
+                                A[nm1*num_samples+idx] = ans;
+                                return;
+                        }
+                }
+                //if (i==2000000) printf("Series failed in exponential integral");
+        }
+        else {
+                b=x+n;
+                c=bigFloat;
+                d=1.0f/b;
+                h=d;
+                for (i=1;i<=20000000;i++) {
+                        a=-i*(nm1+i);
+                        b+=2.0f;
+                        d=1.0f/(a*d+b);
+                        c=b+a/c;
+                        del=c*d;
+                        h*=del;
+                        if (fabs(del-1.0f)<=epsilon) {
+                                ans=h*exp(-x);
+                                A[nm1*num_samples+idx] = ans;
+                                return;
+                        }
+                }
+        }
 }
