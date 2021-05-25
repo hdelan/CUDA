@@ -74,4 +74,20 @@
         \label{sec:cuda_implementation}
         
         Please see \texttt{gpu\_funcs.cu}.
+
+        Advanced techniques used:
+        \begin{itemize}
+                \item Constant/Shared memory---constant memory was used in the first implementations, but it was markedly slower than initializing shared memory with hard coded values. The final implementation uses shared memory as a fast alternative to constant memory.
+                \item Multiple Cards/Streams---Multiple cards are used if you provide the \texttt{-s} option. This gives a real boost to performance, especially due to using \texttt{cudaMemcpyAsync()}, which allows memory transfer on one card to overlap with computation on the other card. \texttt{make run2} will run the code on two cards and report individual timings for each card. Since streams are understood to be launched simultaneously, we can take the overall run time as the greater of the two individual timings. 
+        \end{itemize}
+
+        Advanced techniques considered:
+        \begin{itemize}
+                \item Texture memory---Texture memory was considered so that we could index between a and b with floating point indexes. However this was decided against since the overhead of creating and initializing texture memory outweighed the cost of creating x values in kernel, which requires no cudaMemcpys before the kernel can start.
+                \item Dynamic Parallelism---Potential approach of launching one thread per n value, and precomputing \texttt{psi} (if \texttt{a<=1.0}), before launching enough threads/blocks to compute the \texttt{numberOfSamples} x values from \texttt{a} to \texttt{b} for that given value of \texttt{n}. 
+        \end{itemize}
+\section{Performance}%
+\label{sec:performance}
+
+
 \end{document}
