@@ -239,6 +239,25 @@ void launch_on_one_card(float * & resultsFloatGpu, const unsigned n, const unsig
 }
 
 
+/* --------------------------------------------------------------------------*/
+/**
+ * \brief:       Part 1 in dynamically parallel solution. Each thread in this 
+                 kernel is responsible for an entire n value (column). It will 
+                 precompute psi to pass into its child kernels. The child kernels
+                 will compute the function for each value of x in our range.
+                 
+ *
+ * \param:       start
+ * \param:       end
+ * \param:       num_samples
+ * \param:       start_n
+ * \param:       max_n
+ * \param:       division
+ * \param:       A
+ *
+ * \returns      
+ */
+/* ----------------------------------------------------------------------------*/
 __global__ void GPU_exponentialIntegralFloat_4_launch (const float start, const float end, const int num_samples, const int start_n, const int max_n, float division, float * A) {
         int n=blockIdx.x*blockDim.x+threadIdx.x+1;
         if (n >= max_n) return;
@@ -258,6 +277,22 @@ __global__ void GPU_exponentialIntegralFloat_4_launch (const float start, const 
 
 
 
+/* --------------------------------------------------------------------------*/
+/**
+ * \brief:       Part 2 in dynamically parallel solution. Values of n are passed 
+                 down and this kernel computes for various values of x.
+ *
+ * \param:       start
+ * \param:       end
+ * \param:       num_samples
+ * \param:       n
+ * \param:       division
+ * \param:       psi_precomputed
+ * \param:       A
+ *
+ * \returns      
+ */
+/* ----------------------------------------------------------------------------*/
 __global__ void GPU_exponentialIntegralFloat_4_execute (const float start, const float end, const int num_samples, const int n, const float division, const float psi_precomputed, float * A) {
         __shared__ float eulerConstant; eulerConstant=0.5772156649015329f;
         __shared__ float psi; psi=psi_precomputed;
